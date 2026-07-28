@@ -1,0 +1,4 @@
+/* App-level: just ensures pages fill the viewport */
+.page-shell {
+  min-height: 100vh;
+}

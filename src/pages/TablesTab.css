@@ -1,0 +1,633 @@
+﻿/* TablesTab — visual seating chart ─────────────────────────────────────────── */
+.tt-root {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* ─── Page header ─────────────────────────────────────────────────────────────── */
+.tt-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tt-btn-add-table {
+  flex-shrink: 0;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--r-full);
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter var(--t-fast), transform var(--t-fast);
+}
+.tt-btn-add-table:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* ─── Table card actions ──────────────────────────────────────────────────────── */
+.tt-table-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tt-table-card-info { min-width: 0; }
+
+.tt-table-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.tt-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-solid);
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: grid;
+  place-items: center;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.tt-icon-btn:hover { background: var(--cream-2); border-color: rgba(27,42,74,0.25); }
+.tt-icon-btn.danger:hover { background: rgba(161,60,63,0.08); border-color: rgba(161,60,63,0.3); }
+
+/* Delete confirm strip */
+.tt-confirm-del {
+  background: rgba(161, 60, 63, 0.06);
+  border: 1px solid rgba(161, 60, 63, 0.2);
+  border-radius: var(--r-md);
+  padding: 0.65rem 0.85rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.tt-confirm-del p { margin: 0; font-size: 0.82rem; color: var(--text-strong); }
+.tt-confirm-del-btns { display: flex; gap: 0.5rem; }
+
+.tt-btn-cancel {
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--t-fast), color var(--t-fast);
+}
+.tt-btn-cancel:hover { border-color: var(--navy);color: var(--navy); }
+
+.tt-btn-del-confirm {
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--r-full);
+  border: none;
+  background: rgba(161, 60, 63, 0.85);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.tt-btn-del-confirm:hover { background: var(--terracotta); }
+
+/* "Add table" card in grid */
+.tt-add-card {
+  min-height: 140px;
+  border: 2px dashed rgba(107, 35, 41, 0.2);
+  border-radius: var(--r-lg);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: rgba(107, 35, 41, 0.45);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.tt-add-card:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+  background: rgba(161, 60, 63, 0.03);
+}
+.tt-add-icon {
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* ─── Table modal ─────────────────────────────────────────────────────────────── */
+.tt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 10, 12, 0.45);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.tt-modal {
+  background: var(--surface-solid);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 380px;
+  overflow: hidden;
+}
+
+.tt-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.tt-modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--wine);
+  margin: 0;
+}
+.tt-modal-close {
+  width: 30px; height: 30px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+}
+.tt-modal-close:hover { background: var(--cream-2); color: var(--wine); }
+
+.tt-modal-body {
+  padding: 1.25rem 1.4rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.tt-form-field {
+  display: grid;
+  gap: 0.35rem;
+}
+.tt-form-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.tt-form-field input {
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--border-soft);
+  background: var(--surface);
+  font-size: 0.9rem;
+  color: var(--text-strong);
+  font-family: var(--font-body);
+  transition: border-color var(--t-fast);
+  width: 100%;
+  box-sizing: border-box;
+}
+.tt-form-field input:focus {
+  outline: none;
+  border-color: var(--terracotta);
+}
+
+.tt-modal-actions {
+  display: flex;
+  gap: 0.65rem;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+.tt-btn-save {
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--r-full);
+  border: none;
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter var(--t-fast);
+}
+.tt-btn-save:hover { filter: brightness(1.08); }
+
+/* ─── Summary strip ──────────────────────────────────────────────────────────── */
+.tt-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.5rem;
+}
+
+.tt-sum-item {
+  display: grid;
+  gap: 0.1rem;
+  text-align: center;
+  min-width: 70px;
+}
+
+.tt-sum-num {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  color: var(--wine);
+  line-height: 1;
+}
+.tt-sum-num.ok   { color: #2e7d52; }
+.tt-sum-num.warn { color: #b97c0a; }
+
+.tt-sum-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tt-sum-sep {
+  width: 1px;
+  height: 32px;
+  background: var(--border-soft);
+  flex-shrink: 0;
+}
+
+/* ─── Page layout ─────────────────────────────────────────────────────────────── */
+.tt-layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────────────────────── */
+.tt-sidebar {
+  display: grid;
+  gap: 0.75rem;
+  position: sticky;
+  top: 80px;
+}
+
+.tt-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tt-sidebar-head h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--wine);
+  margin: 0;
+}
+
+.tt-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 5px;
+  border-radius: var(--r-full);
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* Pool droppable area */
+.tt-pool {
+  background: var(--surface);
+  border: 2px dashed rgba(107, 35, 41, 0.18);
+  border-radius: var(--r-lg);
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 120px;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.tt-pool.pool-over {
+  border-color: var(--terracotta);
+  background: rgba(161, 60, 63, 0.04);
+}
+
+.tt-pool-empty {
+  margin: auto;
+  font-size: 0.8rem;
+  color: #2e7d52;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+/* Pool chip (unassigned guest) */
+.tt-pool-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--r-full);
+  border: 1.5px solid;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: transform var(--t-fast), box-shadow var(--t-fast), opacity var(--t-fast);
+}
+
+.tt-pool-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+  filter: brightness(0.95);
+}
+
+.tt-pool-chip.tt-dragging { opacity: 0.3; cursor: grabbing; }
+
+.tt-pool-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.tt-pool-badge {
+  font-size: 0.66rem;
+  font-weight: 800;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.tt-sidebar-hint {
+  margin: 0;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* ─── Tables grid ─────────────────────────────────────────────────────────────── */
+.tt-tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ─── Table card ──────────────────────────────────────────────────────────────── */
+.tt-table-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  gap: 0.75rem;
+  transition: box-shadow var(--t-med);
+}
+
+.tt-table-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tt-table-card-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--wine);
+  margin: 0 0 0.15rem;
+}
+
+.tt-table-card-area {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.tt-seat-badge {
+  flex-shrink: 0;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--r-full);
+  background: rgba(107, 35, 41, 0.08);
+  color: var(--wine);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid rgba(107, 35, 41, 0.12);
+  white-space: nowrap;
+}
+
+.tt-seat-badge.full {
+  background: rgba(161, 60, 63, 0.12);
+  color: var(--terracotta);
+  border-color: rgba(161, 60, 63, 0.25);
+}
+
+/* ─── Circular table visual ───────────────────────────────────────────────────── */
+.tt-circle-wrap {
+  position: relative;
+  margin: 0 auto;
+}
+
+/* SVG connector lines */
+.tt-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Center table circle */
+.tt-surface {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #922d34, var(--wine));
+  border: 3px solid rgba(216, 173, 88, 0.45);
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 4px 18px rgba(107, 35, 41, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 2;
+}
+
+.tt-surface span {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 247, 235, 0.85);
+  letter-spacing: 0.06em;
+}
+
+/* ─── Seat slot ───────────────────────────────────────────────────────────────── */
+.tt-seat {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-full);
+  border: 1.5px solid rgba(107, 35, 41, 0.18);
+  background: var(--surface-solid);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+  transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
+}
+
+.tt-seat.empty:hover {
+  border-color: rgba(107, 35, 41, 0.35);
+  background: rgba(107, 35, 41, 0.04);
+}
+
+.tt-seat.seat-over {
+  border-color: #2a7d52 !important;
+  background: rgba(42, 125, 82, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(42, 125, 82, 0.2);
+}
+
+.tt-seat.seat-blocked {
+  border-color: rgba(139, 48, 48, 0.7) !important;
+  background: rgba(139, 48, 48, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(139, 48, 48, 0.15);
+  cursor: not-allowed;
+}
+
+.tt-seat.occupied {
+  /* background and borderColor set via inline style (per-guest color) */
+}
+
+.tt-seat-num {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(107, 35, 41, 0.28);
+  pointer-events: none;
+}
+
+/* ─── Guest chip on seat ──────────────────────────────────────────────────────── */
+.tt-seat-guest {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  font-size: 0.59rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: var(--r-full);
+  touch-action: none;
+  transition: filter var(--t-fast), opacity var(--t-fast);
+  /* color is inherited from parent .tt-seat inline style */
+  color: inherit;
+}
+
+.tt-seat-guest:hover {
+  filter: brightness(0.9);
+}
+
+.tt-seat-guest.tt-dragging {
+  opacity: 0.2;
+  cursor: grabbing;
+}
+
+/* ─── Table legend ────────────────────────────────────────────────────────────── */
+.tt-table-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+.tt-legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--r-full);
+  border: 1px solid;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.tt-legend-chip em {
+  font-style: normal;
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+/* ─── Drag overlay ghost ──────────────────────────────────────────────────────── */
+.tt-drag-ghost {
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--r-full);
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-md);
+  transform: rotate(2deg) scale(1.06);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .tt-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tt-sidebar {
+    position: static;
+  }
+
+  .tt-pool {
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: auto;
+  }
+
+  .tt-tables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .tt-tables-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tt-summary {
+    gap: 0.75rem;
+  }
+
+  .tt-sum-sep { display: none; }
+}
+
