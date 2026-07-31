@@ -1,11 +1,13 @@
 // ─── Wedding constants ────────────────────────────────────────────────────────
-export const coupleName = 'Jonathan & Jasmin'
-export const eventDateLabel = '01 de febrero de 2027'
-export const eventDateISO = '2027-02-01T14:00:00'
-export const eventTimeLabel = '14:00 hrs'
-export const eventLocation = 'Av. San Martín y 4to Anillo, Equipetrol Norte, Santa Cruz de la Sierra, Bolivia'
+export const coupleName = 'Fernando & Jesica'
+export const eventDateLabel = '14 de noviembre de 2026'
+export const eventDateISO = '2026-11-14T14:00:00'
+export const eventTimeLabel = '2:00 p.m.'
+export const eventLocation = 'Aldea el Conacaste, Casa de Playa Asunción'
+export const eventMapsLink = 'https://maps.app.goo.gl/hRLyHZ1qtPaQCys46'
+export const eventWazeLink = 'https://ul.waze.com/ul?place=ChIJEWHbhCb1iIURwoaDRfFWEwU&ll=13.93003500%2C-90.66018380&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location'
 export const adminUsername = 'admin'
-export const adminPassword = 'jj2026'
+export const adminPassword = 'fj2026'
 
 // ─── Storage keys ─────────────────────────────────────────────────────────────
 const GUEST_SESSION_KEY = 'bodanica.invite.session.v1'
@@ -58,21 +60,22 @@ export function deleteTableFromList(tables, id) {
 // ─── Static invitation content ────────────────────────────────────────────────
 export const timeline = [
   { time: '2:00 p.m.', title: 'LLEGADA', detail: 'Recepción de invitados.' },
-  { time: '2:30 p.m.', title: 'CEREMONIA', detail: 'Unión sagrada en la capilla.' },
-  { time: '4:00 p.m.', title: 'CÓCTEL', detail: 'Brindis y primeros saludos.' },
-  { time: '6:00 p.m.', title: 'CELEBRACIÓN', detail: 'Cena, baile y recuerdos hasta el amanecer.' },
+  { time: '3:00 p.m.', title: 'CEREMONIA', detail: 'Unión en la Capilla.' },
+  { time: '4:00 p.m.', title: 'FOTOS CON LOS INVITADOS', detail: 'Sonrisas hoy, recuerdos para toda la vida.' },
+  { time: '5:00 p.m.', title: 'BANQUETE', detail: 'Buena comida, grandes amigos y una tarde inolvidable en la casa de playa.' },
+  { time: '6:00 p.m.', title: 'CELEBRACIÓN', detail: 'Baile y recuerdos hasta el amanecer.' },
 ]
 
 export const dressCode = {
-  palette: ['#C4622D', '#1B4332', '#2A6B7C', '#8B1A1A', '#111111'],
-  men: 'Traje sastre y corbata',
-  women: 'Vestido largo elegante',
-  notes: ['Formal · Elegante', 'Por favor evitar el uso del color blanco.'],
+  palette: ['#FFFFFF', '#F8F5EE', '#F1E4C9'],
+  men: 'Ropa fresca de color blanco.',
+  women: 'Vestido o conjunto blanco.',
+  notes: ['Estilo Playero · Casual', 'El uso del color blanco es indispensable.'],
 }
 
 export const gifts = [
   { title: 'LLUVIA DE SOBRES', detail: 'Contaremos con un buzón el día del evento.' },
-  { title: 'TRANSFERENCIA', detail: 'Cuenta: 123-456789-00 | Banco: Central Wedding Bank' },
+  { title: 'TRANSFERENCIA', detail: 'Cuenta: 0120334552 · Banco Industrial · Monetaria BI' },
 ]
 
 export const practicalAdvice = [

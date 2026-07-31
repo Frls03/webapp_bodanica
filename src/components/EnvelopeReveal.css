@@ -1,12 +1,25 @@
 /* EnvelopeReveal ───────────────────────────────────────────────────────────── */
 .env-shell {
+  --navy:             #2F6A82;
+  --wine:             #AD7A2C;
+  --gold:             #C79A3D;
+  --cream:            #FAF3E6;
+  --text-muted:       #5C7683;
+
+  --floral-blue:       #7093C2;
+  --floral-blue-deep:  #3F5F8F;
+  --floral-tan:        #CDAE86;
+  --floral-tan-deep:   #8A6A45;
+  --leaf:              #8EA77C;
+  --leaf-deep:         #64805A;
+  --paper:             #FFFBF3;
+
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 2rem 1rem;
   background:
-    radial-gradient(ellipse at top, rgba(27, 42, 74, 0.1) 0%, transparent 50%),
-    var(--cream);
+    linear-gradient(180deg, #CFE7F2 0%, #E4F0EC 46%, #8FC0D6 68%, #5F9DB8 88%, #2F6A82 100%);
   position: relative;
   overflow: hidden;
 }
@@ -28,12 +41,24 @@
   display: grid;
   place-items: center;
   gap: 2.5rem;
+  padding: 2.5rem clamp(1.25rem, 6vw, 3rem);
+  border-radius: var(--r-xl);
+  background: rgba(255, 251, 243, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation: env-appear 0.7s ease both;
 }
 
 @keyframes env-appear {
   from { opacity: 0; transform: scale(0.9) translateY(20px); }
   to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+.env-rings-icon {
+  width: 30px;
+  height: 30px;
+  color: var(--gold);
+  margin: 0 auto -0.5rem;
 }
 
 .env-eyebrow {
@@ -116,13 +141,13 @@
   left: -1px;
   right: -1px;
   height: 58%;
-  background: linear-gradient(175deg, var(--wine) 0%, #8b2e35 100%);
+  background: linear-gradient(175deg, var(--navy) 0%, #1F4C5F 100%);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   transform-origin: top center;
   transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 3;
   border-radius: 4px 4px 0 0;
-  box-shadow: 0 4px 12px rgba(107, 35, 41, 0.25);
+  box-shadow: 0 4px 12px rgba(47, 106, 130, 0.28);
 }
 
 .envelope.opening .env-flap,
@@ -139,14 +164,14 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #9a2e35, var(--wine));
-  border: 2px solid rgba(216, 173, 88, 0.6);
+  background: radial-gradient(circle at 35% 35%, #dcb45c, var(--gold));
+  border: 2px solid rgba(255, 255, 255, 0.55);
   display: grid;
   place-items: center;
   z-index: 4;
   box-shadow:
-    0 2px 8px rgba(107, 35, 41, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 2px 8px rgba(138, 106, 32, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
@@ -160,7 +185,7 @@
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgba(255, 247, 235, 0.9);
+  color: rgba(36, 66, 78, 0.85);
   letter-spacing: 0.05em;
 }
 

@@ -1,0 +1,46 @@
+/* FloralCorner ─────────────────────────────────────────────────────────────── */
+.floral-corner {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 6px 14px rgba(31, 76, 95, 0.08));
+}
+
+.floral-corner svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.floral-corner--lg {
+  width: clamp(140px, 20vw, 260px);
+  height: clamp(140px, 20vw, 260px);
+}
+
+.floral-corner--md {
+  width: clamp(96px, 14vw, 170px);
+  height: clamp(96px, 14vw, 170px);
+}
+
+.floral-corner--sm {
+  width: clamp(64px, 9vw, 108px);
+  height: clamp(64px, 9vw, 108px);
+}
+
+.floral-corner--top-left    { top: 0; left: 0; }
+.floral-corner--top-right   { top: 0; right: 0; transform: scaleX(-1); }
+.floral-corner--bottom-left { bottom: 0; left: 0; transform: scaleY(-1); }
+.floral-corner--bottom-right{ bottom: 0; right: 0; transform: scale(-1, -1); }
+
+@media (max-width: 560px) {
+  .floral-corner--lg { width: clamp(110px, 34vw, 180px); height: clamp(110px, 34vw, 180px); }
+  .floral-corner--md { width: clamp(80px, 26vw, 120px); height: clamp(80px, 26vw, 120px); }
+}
+
+/* Section sprig — small botanical flourish above module titles ─────────────── */
+.section-sprig {
+  display: block;
+  width: clamp(64px, 9vw, 92px);
+  height: auto;
+  margin: 0 auto 0.6rem;
+}

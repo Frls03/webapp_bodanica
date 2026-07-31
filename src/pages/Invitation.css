@@ -1,5 +1,42 @@
-﻿/* Invitation ──────────────────────────────────────────────────────────────── */
+/* Invitation ──────────────────────────────────────────────────────────────── */
+/* Coastal watercolor theme — scoped to the guest-facing invitation only, so    */
+/* the admin panel keeps its original navy/wine palette untouched.             */
 .inv-shell {
+  --navy:             #2F6A82;
+  --navy-light:       #3F8098;
+  --wine:             #AD7A2C;
+  --wine-soft:        #C99B55;
+  --gold:             #C79A3D;
+  --gold-light:       rgba(199, 154, 61, 0.18);
+  --cream:            #FAF3E6;
+  --cream-2:          #E9D9BC;
+  --parchment:        #F1E4C9;
+  --text-strong:      #24424E;
+  --text-muted:       #5C7683;
+
+  --surface:          rgba(250, 243, 230, 0.92);
+  --surface-solid:    #FFFBF3;
+  --border-soft:      rgba(47, 106, 130, 0.15);
+  --border-med:       rgba(47, 106, 130, 0.26);
+
+  /* coastal-only tokens, used by hero/waves/florals */
+  --sky-top:          #CFE7F2;
+  --sky-mid:          #E4F0EC;
+  --sea-light:        #8FC0D6;
+  --sea:              #5F9DB8;
+  --sea-deep:         #2F6A82;
+  --sea-abyss:        #1F4C5F;
+  --sand:             #F1E4C9;
+  --sand-light:       #FAF3E6;
+  --floral-blue:       #7093C2;
+  --floral-blue-deep:  #3F5F8F;
+  --floral-tan:        #CDAE86;
+  --floral-tan-deep:   #8A6A45;
+  --leaf:              #8EA77C;
+  --leaf-deep:         #64805A;
+  --paper:             #FFFBF3;
+  --decline:           #A24A45;
+
   background: var(--cream);
   overflow-x: hidden;
 }
@@ -13,7 +50,7 @@
   align-items: center;
   gap: 1.5rem;
   padding: 0.9rem clamp(1rem, 5vw, 4rem);
-  background: rgba(245, 240, 232, 0.92);
+  background: var(--surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-soft);
@@ -64,19 +101,67 @@
 /* ─── Modules shared ──────────────────────────────────────────────────────── */
 .inv-module {
   padding: clamp(4rem, 8vw, 7rem) clamp(1rem, 4vw, 3rem);
+  position: relative;
+  overflow: hidden;
 }
 
-.inv-soft {
-  background:
-    radial-gradient(ellipse at top, rgba(27, 42, 74, 0.04) 0%, transparent 60%),
-    var(--parchment);
-  border-top: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
+/* A hairline-thin gold thread at the top of every module but the first — just
+   enough to mark where one part of the invitation ends and the next begins,
+   without ever breaking the continuous gradient behind it. */
+.inv-ocean-band > .inv-module:not(:first-child),
+.inv-footer {
+  box-shadow: inset 0 1px 0 rgba(199, 154, 61, 0.32);
+}
+
+/* Hero → RSVP all share ONE continuous gradient across the whole band instead
+   of each module painting its own light→dark arc — separate arcs are what
+   read as fragmented, chopped-up stripes (and every reset was also a place
+   text sitting directly on the background could land in a dark, low-contrast
+   patch). One smooth, slow-darkening wash behind every module keeps the
+   scroll feeling like a single, uninterrupted sea from the opening line all
+   the way down to the shoreline, with no seams to hide with wave shapes. The
+   very end warms into sand, so the RSVP card is the last thing to sit on the
+   water before the beach takes over in the footer. */
+.inv-ocean-band {
+  position: relative;
+  background: linear-gradient(180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 10%,
+    var(--sea-light) 30%,
+    var(--sea-light) 78%,
+    var(--sea) 90%,
+    var(--sea-deep) 96%,
+    var(--sand) 100%
+  );
+}
+
+/* Watercolor grain + gentle ripple bands, so the flat gradient reads as
+   painted sea/sky rather than a flat digital fill. Sits behind every module
+   (they paint over it) and never intercepts clicks. */
+.inv-ocean-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image:
+    repeating-linear-gradient(179deg,
+      transparent 0px, transparent 46px,
+      rgba(255, 255, 255, 0.06) 47px, rgba(255, 255, 255, 0.06) 49px,
+      transparent 50px, transparent 118px,
+      rgba(19, 41, 51, 0.05) 119px, rgba(19, 41, 51, 0.05) 120px,
+      transparent 121px, transparent 168px
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 100% 168px, 220px 220px;
+  background-repeat: repeat, repeat;
 }
 
 .inv-inner {
   width: min(1100px, 100%);
   margin: 0 auto;
+  position: relative;
 }
 
 .inv-narrow {
@@ -91,6 +176,7 @@
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 4.5vw, 3rem);
   color: var(--navy);
+  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.55);
 }
 
 .inv-section-copy {
@@ -99,6 +185,7 @@
   color: var(--text-muted);
   line-height: 1.8;
   font-size: clamp(0.95rem, 2vw, 1.05rem);
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.5);
 }
 
 .inv-eyebrow {
@@ -108,39 +195,96 @@
   letter-spacing: 0.04em;
   color: var(--text-muted);
   font-style: italic;
+  text-transform: uppercase;
+}
+
+/* Divider — thin gold line with a small centered diamond, like a wax-seal motif */
+.inv-shell .divider {
+  position: relative;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+}
+
+.inv-shell .divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  transform: translate(-50%, -50%) rotate(45deg);
+  box-shadow: 0 0 0 4px var(--cream);
 }
 
 /* ─── MODULE 1 · Hero ─────────────────────────────────────────────────────── */
+/* No background of its own — it sits at the top of .inv-ocean-band and shows
+   that shared gradient through, so there's no seam between hero and content. */
 .inv-hero {
   position: relative;
   min-height: calc(100svh - 60px);
   display: grid;
   place-items: center;
   text-align: center;
-  background:
-    radial-gradient(ellipse at top,    rgba(27, 42, 74, 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse at bottom, rgba(122, 26, 26, 0.06) 0%, transparent 50%),
-    linear-gradient(180deg, var(--cream) 0%, var(--parchment) 100%);
+  overflow: hidden;
 }
 
+/* soft cloud wisps in the sky */
 .inv-hero-overlay {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(27, 42, 74, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(27, 42, 74, 0.03) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.5), transparent 80%);
+    radial-gradient(ellipse 42% 10% at 18% 16%, rgba(255,255,255,0.65) 0%, transparent 70%),
+    radial-gradient(ellipse 34% 8% at 72% 10%, rgba(255,255,255,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 7% at 50% 24%, rgba(255,255,255,0.4) 0%, transparent 70%);
   pointer-events: none;
+}
+
+/* gentle foam line at the horizon where sea meets sky-mid */
+.inv-hero-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 58%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.55), transparent);
+  pointer-events: none;
+}
+
+.inv-hero-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.inv-hero-sparkles .spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 7px 1.5px rgba(199, 154, 61, 0.55);
+  animation: spark-twinkle 3.4s ease-in-out infinite;
+}
+
+.inv-hero-sparkles .s1 { top: 10%; left: 68%; animation-delay: 0s; }
+.inv-hero-sparkles .s2 { top: 20%; left: 84%; animation-delay: 0.6s; }
+.inv-hero-sparkles .s3 { top: 7%;  left: 52%; animation-delay: 1.1s; }
+.inv-hero-sparkles .s4 { top: 28%; left: 91%; animation-delay: 1.6s; }
+.inv-hero-sparkles .s5 { top: 16%; left: 37%; animation-delay: 2s; }
+.inv-hero-sparkles .s6 { top: 33%; left: 12%; animation-delay: 0.3s; }
+
+@keyframes spark-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50%       { opacity: 1;    transform: scale(1.3); }
 }
 
 .inv-hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   justify-items: center;
   gap: 1.1rem;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 5rem;
   animation: hero-in 0.9s ease both;
 }
 
@@ -154,6 +298,7 @@
   font-size: clamp(3rem, 9vw, 5.5rem);
   color: var(--navy);
   line-height: 1.05;
+  text-shadow: 0 2px 24px rgba(255, 255, 255, 0.5);
 }
 
 .inv-guest-label {
@@ -174,10 +319,12 @@
   margin: 0.5rem auto 0;
   font-style: italic;
   color: var(--text-muted);
-  background: var(--parchment);
-  border: 1px solid rgba(27, 42, 74, 0.1);
+  background: rgba(255, 251, 243, 0.72);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-soft);
   border-radius: var(--r-md);
   padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .inv-quote p {
@@ -204,13 +351,14 @@
   color: var(--navy);
   letter-spacing: 0.08em;
   margin: 0.25rem 0;
+  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.55);
 }
 
 .inv-change-btn {
   margin-top: 0.5rem;
   padding: 0.7rem 1.3rem;
   border-radius: var(--r-full);
-  background: rgba(27, 42, 74, 0.06);
+  background: rgba(255, 251, 243, 0.55);
   border: 1px solid var(--border-soft);
   color: var(--text-muted);
   font-size: 0.82rem;
@@ -219,7 +367,7 @@
 }
 
 .inv-change-btn:hover {
-  background: rgba(27, 42, 74, 0.1);
+  background: rgba(255, 251, 243, 0.85);
   color: var(--navy);
 }
 
@@ -241,8 +389,10 @@
 }
 
 .inv-event-icon {
-  font-size: 1.75rem;
-  margin-bottom: 0.6rem;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 0.6rem;
+  color: var(--gold);
 }
 
 .inv-event-card h3 {
@@ -271,6 +421,7 @@
   letter-spacing: 0.2em;
   color: var(--wine);
   text-transform: uppercase;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.55);
 }
 
 .inv-countdown-row {
@@ -290,8 +441,9 @@
 .inv-count-num {
   font-family: var(--font-display);
   font-size: clamp(2rem, 6vw, 3.2rem);
-  color: var(--wine);
+  color: var(--navy);
   line-height: 1;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.55);
 }
 
 .inv-count-label {
@@ -300,6 +452,7 @@
   letter-spacing: 0.12em;
   color: var(--text-muted);
   text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.55);
 }
 
 .inv-count-sep {
@@ -336,7 +489,7 @@
 .inv-map-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  background: rgba(161, 60, 63, 0.06);
+  background: rgba(47, 106, 130, 0.06);
 }
 
 /* Advice list */
@@ -390,6 +543,7 @@
   color: var(--wine);
   font-size: 0.88rem;
   padding-top: 0.15rem;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.55);
 }
 
 .inv-tl-line {
@@ -405,7 +559,7 @@
   border-radius: 50%;
   background: var(--navy);
   border: 2px solid var(--cream);
-  box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.22);
+  box-shadow: 0 0 0 3px rgba(47, 106, 130, 0.22);
   flex-shrink: 0;
   margin-top: 0.15rem;
 }
@@ -413,7 +567,7 @@
 .inv-tl-connector {
   flex: 1;
   width: 2px;
-  background: linear-gradient(180deg, rgba(27, 42, 74, 0.35), rgba(27, 42, 74, 0.1));
+  background: linear-gradient(180deg, rgba(47, 106, 130, 0.35), rgba(47, 106, 130, 0.1));
   min-height: 48px;
   margin: 4px 0;
 }
@@ -511,17 +665,12 @@
   color: var(--text-muted);
   font-size: 0.88rem;
   line-height: 1.7;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.55);
 }
 
 .inv-dress-notes p { margin: 0; }
 
 /* ─── MODULE 5 · Gifts ────────────────────────────────────────────────────── */
-.inv-gift-icon {
-  font-size: 2rem;
-  color: var(--gold);
-  margin-bottom: 0.5rem;
-}
-
 .inv-gift-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -554,11 +703,24 @@
 
 /* ─── MODULE 6 · RSVP ────────────────────────────────────────────────────── */
 .inv-rsvp-card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: var(--r-xl);
   padding: clamp(1.5rem, 4vw, 2.5rem);
   box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.inv-rsvp-watermark {
+  position: absolute;
+  top: -14px;
+  right: -10px;
+  width: 92px;
+  height: 92px;
+  color: var(--gold);
+  opacity: 0.14;
+  pointer-events: none;
 }
 
 .inv-rsvp-form {
@@ -592,8 +754,8 @@
   gap: 0.65rem;
   padding: 0.75rem 1rem;
   border-radius: var(--r-md);
-  background: rgba(216, 173, 88, 0.1);
-  border: 1px solid rgba(216, 173, 88, 0.35);
+  background: rgba(199, 154, 61, 0.1);
+  border: 1px solid rgba(199, 154, 61, 0.35);
 }
 .inv-type-icon { font-size: 1.25rem; line-height: 1; flex-shrink: 0; margin-top: 0.05rem; }
 .inv-type-callout p {
@@ -635,9 +797,9 @@
 }
 
 .inv-att-btn.active.decline {
-  background: rgba(107, 35, 41, 0.1);
-  border-color: rgba(107, 35, 41, 0.3);
-  color: var(--wine);
+  background: rgba(162, 74, 69, 0.1);
+  border-color: rgba(162, 74, 69, 0.32);
+  color: var(--decline);
   box-shadow: none;
 }
 
@@ -656,7 +818,7 @@
 .inv-rsvp-input:focus {
   outline: none;
   border-color: var(--navy);
-  box-shadow: 0 0 0 4px rgba(27, 42, 74, 0.1);
+  box-shadow: 0 0 0 4px rgba(47, 106, 130, 0.12);
 }
 
 .inv-rsvp-textarea {
@@ -697,11 +859,15 @@
   border-radius: 50%;
   background: var(--navy);
   color: var(--cream);
-  font-size: 1.8rem;
   display: grid;
   place-items: center;
   margin: 0 auto 0.5rem;
   box-shadow: var(--shadow-sm);
+}
+
+.inv-success-icon svg {
+  width: 30px;
+  height: 30px;
 }
 
 .inv-rsvp-success h3 {
@@ -732,24 +898,77 @@
   color: var(--navy);
 }
 
-/* ─── Footer ──────────────────────────────────────────────────────────────── */
+/* ─── Footer · the shoreline ─────────────────────────────────────────────── */
+/* The reference photo closes on sand with flowers, a starfish, a shell and a
+   pair of rings — the footer picks up exactly where .inv-ocean-band's tail
+   already warmed into sand, so the beach arrives as a continuation of the
+   same gradient rather than a separate dark block. */
 .inv-footer {
-  padding: 2.5rem 1rem 3rem;
+  position: relative;
+  padding: 3.5rem 1rem 3rem;
   text-align: center;
   display: grid;
   gap: 0.5rem;
-  background: var(--navy);
-  border-top: 1px solid rgba(27, 42, 74, 0.3);
+  background: linear-gradient(180deg, var(--sand) 0%, var(--floral-tan) 100%);
+  overflow: hidden;
+}
+
+/* Shells, a starfish and a pair of rings washed up beside the flowers —
+   the same small scene the reference photo rests in its bottom-left corner. */
+.inv-footer-beach-cluster {
+  position: absolute;
+  left: clamp(56px, 11vw, 138px);
+  bottom: clamp(8px, 2.5vw, 24px);
+  width: 130px;
+  height: 90px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.fbc-shell {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: clamp(38px, 6vw, 50px);
+  height: clamp(38px, 6vw, 50px);
+  color: var(--floral-tan-deep);
+  opacity: 0.85;
+  transform: rotate(-14deg);
+  filter: drop-shadow(0 3px 4px rgba(138, 106, 69, 0.35));
+}
+
+.fbc-starfish {
+  position: absolute;
+  left: clamp(30px, 5vw, 42px);
+  bottom: 10px;
+  width: clamp(32px, 5vw, 42px);
+  height: clamp(32px, 5vw, 42px);
+  color: var(--wine);
+  opacity: 0.9;
+  transform: rotate(20deg);
+  filter: drop-shadow(0 3px 4px rgba(138, 106, 69, 0.35));
+}
+
+.fbc-rings {
+  position: absolute;
+  left: clamp(56px, 9vw, 74px);
+  bottom: 0;
+  width: clamp(34px, 5.5vw, 46px);
+  height: clamp(34px, 5.5vw, 46px);
+  color: var(--gold);
+  transform: rotate(-8deg);
+  filter: drop-shadow(0 3px 5px rgba(138, 106, 69, 0.4));
 }
 
 .inv-footer-brand {
   font-family: var(--font-display);
   font-size: 1.4rem;
-  color: rgba(245, 240, 232, 0.9);
+  color: var(--navy);
+  margin-top: 0.5rem;
 }
 
 .inv-footer-copy {
-  color: rgba(245, 240, 232, 0.55);
+  color: var(--floral-tan-deep);
   font-size: 0.84rem;
 }
 
@@ -764,11 +983,11 @@
 .inv-footer-links a {
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(245, 240, 232, 0.6);
+  color: var(--navy);
   transition: color var(--t-fast);
 }
 
-.inv-footer-links a:hover { color: var(--cream); }
+.inv-footer-links a:hover { color: var(--wine); }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
@@ -817,4 +1036,3 @@
     min-width: 56px;
   }
 }
-

@@ -8,6 +8,7 @@ import {
   saveAdminSession,
   saveGuestSession,
 } from '../data/wedding'
+import FloralCorner from './FloralCorner'
 import './PasswordGate.css'
 
 function PasswordGate({ mode, onAuthenticated }) {
@@ -57,8 +58,14 @@ function PasswordGate({ mode, onAuthenticated }) {
   }
 
   return (
-    <div className="gate-shell">
+    <div className={`gate-shell ${isInvite ? 'gate-beach' : ''}`}>
       <div className="gate-bg-pattern" />
+      {isInvite && (
+        <>
+          <FloralCorner corner="top-left" size="md" />
+          <FloralCorner corner="bottom-right" size="md" />
+        </>
+      )}
 
       <div className="gate-card">
         <div className="gate-header">
@@ -68,9 +75,9 @@ function PasswordGate({ mode, onAuthenticated }) {
             <>
               <h1 className="gate-title">¡Nos casamos!</h1>
               <div className="gate-couple">
-                <span>Jasmin</span>
+                <span>Jesica</span>
                 <span className="gate-amp">&</span>
-                <span>Jonathan</span>
+                <span>Fernando</span>
               </div>
             </>
           ) : (

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import FloralCorner from './FloralCorner'
+import { RingsIcon } from './BeachIcons'
 import './EnvelopeReveal.css'
 
 function EnvelopeReveal({ guestName, onOpen }) {
@@ -14,8 +16,11 @@ function EnvelopeReveal({ guestName, onOpen }) {
   return (
     <div className="env-shell">
       <div className="env-bg-pattern" />
+      <FloralCorner corner="top-left" size="md" />
+      <FloralCorner corner="bottom-right" size="md" />
 
       <div className="env-content">
+        <RingsIcon className="env-rings-icon" aria-hidden="true" />
         <p className="env-eyebrow">TIENES UNA INVITACIÓN</p>
 
         <button
@@ -39,7 +44,7 @@ function EnvelopeReveal({ guestName, onOpen }) {
 
           {/* Wax seal */}
           <div className="env-seal" aria-hidden="true">
-            <span className="env-seal-text">J&J</span>
+            <span className="env-seal-text">F&J</span>
           </div>
 
           {/* Guest name */}

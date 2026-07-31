@@ -5,7 +5,9 @@ import {
   eventDateISO,
   eventDateLabel,
   eventLocation,
+  eventMapsLink,
   eventTimeLabel,
+  eventWazeLink,
   getGuestType,
   gifts,
   practicalAdvice,
@@ -14,6 +16,8 @@ import {
   timeline,
   upsertGuest,
 } from '../data/wedding'
+import FloralCorner, { SectionSprig } from '../components/FloralCorner'
+import { CalendarIcon, ClockIcon, PinIcon, RingsIcon, ShellIcon, StarfishIcon } from '../components/BeachIcons'
 import './Invitation.css'
 
 // ─── Countdown hook ────────────────────────────────────────────────────────────
@@ -35,18 +39,6 @@ function useCountdown(isoDate) {
     return () => clearInterval(id)
   }, [isoDate])
   return timeLeft
-}
-
-// ─── Scroll-reveal hook ───────────────────────────────────────────────────────
-function useScrollReveal() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }),
-      { threshold: 0.08 }
-    )
-    document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
 }
 
 // ─── Guest type callout ───────────────────────────────────────────────────────
@@ -85,7 +77,6 @@ function CountUnit({ value, label }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
-  useScrollReveal()
   const timeLeft = useCountdown(eventDateISO)
 
   const [attendance, setAttendance] = useState(guest?.attendance === 'confirmed' ? 'yes' : 'yes')
@@ -136,11 +127,20 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
 
       <main>
 
+        <div className="inv-ocean-band">
+
         {/* ──────────────────────────────────────────────────────────────── */}
         {/* MODULE 1 · Hero                                                  */}
         {/* ──────────────────────────────────────────────────────────────── */}
-        <section className="inv-module inv-hero scroll-reveal visible" id="inicio">
+        <section className="inv-module inv-hero scroll-reveal" id="inicio">
           <div className="inv-hero-overlay" />
+          <div className="inv-hero-horizon" />
+          <div className="inv-hero-sparkles" aria-hidden="true">
+            <span className="spark s1" /><span className="spark s2" /><span className="spark s3" />
+            <span className="spark s4" /><span className="spark s5" /><span className="spark s6" />
+          </div>
+          <FloralCorner corner="top-left" size="lg" />
+          <FloralCorner corner="bottom-right" size="lg" />
           <div className="inv-hero-content">
             <p className="inv-eyebrow">Con la bendición de Dios y junto con nuestras familias</p>
             <h1 className="inv-couple-title">{coupleName}</h1>
@@ -148,8 +148,8 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
             <p className="inv-guest-label">Nos complace invitar a</p>
             <h2 className="inv-guest-name">{guestName}</h2>
             <blockquote className="inv-quote">
-              <p>"Ponme como un sello sobre tu corazón, como un sello sobre tu brazo; porque fuerte como la muerte es el amor."</p>
-              <footer>— Cantares 8:6 NBLA</footer>
+              <p>"De lo que sea que estén hechas nuestras almas, la suya y la mía son lo mismo."</p>
+              <footer>— Emily Brontë</footer>
             </blockquote>
             <button type="button" className="inv-change-btn" onClick={onChangeGuest}>
               ¿No eres tú? Cambiar contraseña
@@ -163,26 +163,27 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
         <section className="inv-module inv-soft scroll-reveal" id="detalles">
           <div className="inv-inner">
             <div className="inv-section-head text-center">
+              <SectionSprig />
               <p className="inv-section-copy" style={{ marginBottom: '0.5rem' }}>
                 Nos complace invitarlos a la celebración de nuestro matrimonio que se celebra el día
               </p>
-              <h2 className="inv-big-date">01 | 02 | 2027</h2>
+              <h2 className="inv-big-date">14 | 11 | 2026</h2>
               <div className="divider" />
             </div>
 
             <div className="inv-event-cards">
               <div className="inv-event-card">
-                <div className="inv-event-icon">📅</div>
+                <CalendarIcon className="inv-event-icon" />
                 <h3>Fecha</h3>
                 <p>{eventDateLabel}</p>
               </div>
               <div className="inv-event-card">
-                <div className="inv-event-icon">🕐</div>
+                <ClockIcon className="inv-event-icon" />
                 <h3>Hora</h3>
                 <p>{eventTimeLabel}</p>
               </div>
               <div className="inv-event-card">
-                <div className="inv-event-icon">📍</div>
+                <PinIcon className="inv-event-icon" />
                 <h3>Lugar</h3>
                 <p>{eventLocation}</p>
               </div>
@@ -203,7 +204,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
 
             <div className="inv-map-row">
               <a
-                href={`https://waze.com/ul?q=${encodeURIComponent(eventLocation)}&navigate=yes`}
+                href={eventWazeLink}
                 target="_blank"
                 rel="noreferrer"
                 className="inv-map-btn"
@@ -211,7 +212,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
                 Ver en Waze
               </a>
               <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventLocation)}`}
+                href={eventMapsLink}
                 target="_blank"
                 rel="noreferrer"
                 className="inv-map-btn"
@@ -235,8 +236,11 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
         {/* MODULE 3 · Cronograma                                           */}
         {/* ──────────────────────────────────────────────────────────────── */}
         <section className="inv-module scroll-reveal" id="cronograma">
+          <FloralCorner corner="top-left" size="sm" />
+          <FloralCorner corner="bottom-right" size="sm" />
           <div className="inv-inner inv-narrow">
             <div className="inv-section-head text-center">
+              <SectionSprig />
               <h2>Cronograma del día</h2>
               <div className="divider" />
             </div>
@@ -263,12 +267,15 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
         {/* MODULE 4 · Dress code                                           */}
         {/* ──────────────────────────────────────────────────────────────── */}
         <section className="inv-module inv-soft scroll-reveal" id="vestimenta">
+          <FloralCorner corner="top-right" size="sm" />
+          <FloralCorner corner="bottom-left" size="sm" />
           <div className="inv-inner">
             <div className="inv-section-head text-center">
+              <SectionSprig />
               <h2>Código de Vestimenta</h2>
               <div className="divider" />
               <p className="inv-section-copy">
-                Nos encantaría verte lucir tu mejor gala para esta noche tan especial.
+                Para celebrar nuestro amor bajo el calor de la playa, te pedimos asistir con tu mejor atuendo totalmente blanco.
               </p>
             </div>
 
@@ -278,7 +285,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
                 <h3>Ellos</h3>
                 <p>{dressCode.men}</p>
               </div>
-              <div className="inv-dress-badge">FORMAL · GALA</div>
+              <div className="inv-dress-badge">TOTAL WHITE</div>
               <div className="inv-dress-card">
                 <div className="inv-dress-icon">♀</div>
                 <h3>Ellas</h3>
@@ -309,14 +316,18 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
         {/* MODULE 5 · Gifts                                                */}
         {/* ──────────────────────────────────────────────────────────────── */}
         <section className="inv-module scroll-reveal" id="regalos">
+          <FloralCorner corner="top-left" size="sm" />
+          <FloralCorner corner="bottom-right" size="sm" />
           <div className="inv-inner text-center">
-            <div className="inv-gift-icon" aria-hidden="true">✦</div>
-            <h2>Mesa de Regalos</h2>
-            <div className="divider" />
-            <p className="inv-section-copy">
-              Vuestra presencia es nuestro mayor regalo. Sin embargo, si desean
-              contribuir a nuestra nueva vida juntos, agradecemos su detalle a través de:
-            </p>
+            <div className="inv-section-head text-center">
+              <SectionSprig />
+              <h2>Mesa de Regalos</h2>
+              <div className="divider" />
+              <p className="inv-section-copy">
+                Vuestra presencia es nuestro mayor regalo. Sin embargo, si desean
+                contribuir a nuestra nueva vida juntos, agradecemos su detalle a través de:
+              </p>
+            </div>
             <div className="inv-gift-cards">
               {gifts.map(gift => (
                 <div className="inv-gift-card" key={gift.title}>
@@ -332,19 +343,23 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
         {/* MODULE 6 · RSVP                                                 */}
         {/* ──────────────────────────────────────────────────────────────── */}
         <section className="inv-module inv-soft scroll-reveal" id="rsvp">
+          <FloralCorner corner="top-right" size="sm" />
+          <FloralCorner corner="bottom-left" size="sm" />
           <div className="inv-inner inv-narrow">
             <div className="inv-section-head text-center">
+              <SectionSprig />
               <h2>R.S.V.P</h2>
               <div className="divider" />
               <p className="inv-section-copy">
-                Confirma tu asistencia antes del 20 de abril de 2026.
+                Confirma tu asistencia antes del 30 de septiembre de 2026.
               </p>
             </div>
 
             <div className="inv-rsvp-card">
+              <RingsIcon className="inv-rsvp-watermark" />
               {submitted ? (
                 <div className="inv-rsvp-success">
-                  <div className="inv-success-icon">✓</div>
+                  <div className="inv-success-icon"><RingsIcon /></div>
                   <h3>
                     {guest?.attendance === 'confirmed'
                       ? '¡Nos alegra que vengas!'
@@ -432,9 +447,18 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
           </div>
         </section>
 
+        </div>
+
       </main>
 
       <footer className="inv-footer">
+        <FloralCorner corner="bottom-left" size="md" />
+        <FloralCorner corner="top-right" size="sm" />
+        <div className="inv-footer-beach-cluster" aria-hidden="true">
+          <ShellIcon className="fbc-shell" />
+          <StarfishIcon className="fbc-starfish" />
+          <RingsIcon className="fbc-rings" />
+        </div>
         <p className="inv-footer-brand">{coupleName}</p>
         <p className="inv-footer-copy">Hecho con amor para nuestro día especial.</p>
         <nav className="inv-footer-links">
