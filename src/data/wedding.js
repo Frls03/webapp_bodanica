@@ -1,8 +1,8 @@
 // ─── Wedding constants ────────────────────────────────────────────────────────
 export const coupleName = 'Fernando & Jesica'
 export const eventDateLabel = '14 de noviembre de 2026'
-export const eventDateISO = '2026-11-14T14:00:00'
-export const eventTimeLabel = '2:00 p.m.'
+export const eventDateISO = '2026-11-14T17:00:00'
+export const eventTimeLabel = '17:00 p.m.'
 export const eventLocation = 'Aldea el Conacaste, Casa de Playa Asunción'
 export const eventMapsLink = 'https://maps.app.goo.gl/hRLyHZ1qtPaQCys46'
 export const eventWazeLink = 'https://ul.waze.com/ul?place=ChIJEWHbhCb1iIURwoaDRfFWEwU&ll=13.93003500%2C-90.66018380&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location'
