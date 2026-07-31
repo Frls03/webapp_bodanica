@@ -1,8 +1,8 @@
 // ─── Wedding constants ────────────────────────────────────────────────────────
 export const coupleName = 'Fernando & Jesica'
 export const eventDateLabel = '14 de noviembre de 2026'
-export const eventDateISO = '2026-11-14T17:00:00'
-export const eventTimeLabel = '17:00 p.m.'
+export const eventDateISO = '2026-11-14T14:00:00'
+export const eventTimeLabel = '2:00 p.m.'
 export const eventLocation = 'Aldea el Conacaste, Casa de Playa Asunción'
 export const eventMapsLink = 'https://maps.app.goo.gl/hRLyHZ1qtPaQCys46'
 export const eventWazeLink = 'https://ul.waze.com/ul?place=ChIJEWHbhCb1iIURwoaDRfFWEwU&ll=13.93003500%2C-90.66018380&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location'
@@ -59,11 +59,11 @@ export function deleteTableFromList(tables, id) {
 
 // ─── Static invitation content ────────────────────────────────────────────────
 export const timeline = [
-  { time: '2:00 p.m.', title: 'LLEGADA', detail: 'Recepción de invitados.' },
-  { time: '3:00 p.m.', title: 'CEREMONIA', detail: 'Unión en la Capilla.' },
-  { time: '4:00 p.m.', title: 'FOTOS CON LOS INVITADOS', detail: 'Sonrisas hoy, recuerdos para toda la vida.' },
-  { time: '5:00 p.m.', title: 'BANQUETE', detail: 'Buena comida, grandes amigos y una tarde inolvidable en la casa de playa.' },
-  { time: '6:00 p.m.', title: 'CELEBRACIÓN', detail: 'Baile y recuerdos hasta el amanecer.' },
+  { time: '14:00 p.m.', title: 'LLEGADA', detail: 'Recepción de invitados.' },
+  { time: '15:00 p.m.', title: 'CEREMONIA', detail: 'Unión en la Capilla.' },
+  { time: '16:00 p.m.', title: 'FOTOS CON LOS INVITADOS', detail: 'Sonrisas hoy, recuerdos para toda la vida.' },
+  { time: '17:00 p.m.', title: 'BANQUETE', detail: 'Buena comida, grandes amigos y una tarde inolvidable en la casa de playa.' },
+  { time: '18:00 p.m.', title: 'CELEBRACIÓN', detail: 'Baile y recuerdos hasta el amanecer.' },
 ]
 
 export const dressCode = {
