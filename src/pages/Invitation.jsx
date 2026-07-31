@@ -10,11 +10,10 @@ import {
   eventWazeLink,
   getGuestType,
   gifts,
+  hospedajeMessage,
   practicalAdvice,
-  readGuests,
-  saveGuests,
+  submitRsvp,
   timeline,
-  upsertGuest,
 } from '../data/wedding'
 import FloralCorner, { SectionSprig } from '../components/FloralCorner'
 import { CalendarIcon, ClockIcon, PinIcon, RingsIcon, ShellIcon, StarfishIcon } from '../components/BeachIcons'
@@ -65,6 +64,17 @@ function GuestTypeCallout({ guest }) {
   )
 }
 
+// ─── Hospedaje callout ─────────────────────────────────────────────────────────
+function HospedajeCallout({ guest }) {
+  if (!guest?.hospedajeFee) return null
+  return (
+    <div className="inv-type-callout inv-hospedaje-callout">
+      <span className="inv-type-icon">🏡</span>
+      <p style={{ whiteSpace: 'pre-line' }}>{hospedajeMessage}</p>
+    </div>
+  )
+}
+
 // ─── Countdown unit ───────────────────────────────────────────────────────────
 function CountUnit({ value, label }) {
   return (
@@ -83,6 +93,8 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
   const [guestCount, setGuestCount] = useState(String(guest?.attendanceCount || 1))
   const [notes, setNotes] = useState(guest?.notes ?? '')
   const [submitted, setSubmitted] = useState(guest?.attendance !== 'pending')
+  const [rsvpSaving, setRsvpSaving] = useState(false)
+  const [rsvpError, setRsvpError] = useState('')
   const navRef = useRef(null)
 
   const guestName = guest?.fullName ?? 'Invitado especial'
@@ -92,24 +104,26 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
     document.title = `${coupleName} | Nuestra Boda`
   }, [])
 
-  function handleRSVP(e) {
+  async function handleRSVP(e) {
     e.preventDefault()
     const confirmed = attendance === 'yes'
     const count = Math.min(Math.max(Number(guestCount) || 1, 1), maxAttendees)
 
-    const updated = {
-      ...guest,
-      attendance: confirmed ? 'confirmed' : 'declined',
-      attendanceCount: confirmed ? count : 0,
-      notes: notes.trim() || guest.notes,
-      updatedAt: new Date().toISOString(),
+    setRsvpError('')
+    setRsvpSaving(true)
+    try {
+      const updated = await submitRsvp(guest, {
+        attendance: confirmed ? 'confirmed' : 'declined',
+        attendanceCount: confirmed ? count : 0,
+        notes: notes.trim(),
+      })
+      onGuestUpdate(updated)
+      setSubmitted(true)
+    } catch {
+      setRsvpError('No se pudo enviar tu confirmación. Intenta de nuevo.')
+    } finally {
+      setRsvpSaving(false)
     }
-
-    const guests = readGuests()
-    const nextGuests = upsertGuest(guests, updated)
-    saveGuests(nextGuests)
-    onGuestUpdate(updated)
-    setSubmitted(true)
   }
 
   return (
@@ -370,6 +384,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
                       ? `Te esperamos el ${eventDateLabel}. ¡Va a ser una noche increíble!`
                       : 'Lamentamos que no puedas acompañarnos. ¡Te mandamos un abrazo!'}
                   </p>
+                  <HospedajeCallout guest={guest} />
                   <button
                     type="button"
                     className="inv-rsvp-edit-btn"
@@ -386,6 +401,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
                   </div>
 
                   <GuestTypeCallout guest={guest} />
+                  <HospedajeCallout guest={guest} />
 
                   <div className="inv-rsvp-field">
                     <label className="inv-rsvp-label">¿Asistirás a la boda?</label>
@@ -438,8 +454,10 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
                     />
                   </div>
 
-                  <button type="submit" className="inv-rsvp-submit">
-                    Enviar confirmación
+                  {rsvpError && <p className="inv-rsvp-error">{rsvpError}</p>}
+
+                  <button type="submit" className="inv-rsvp-submit" disabled={rsvpSaving}>
+                    {rsvpSaving ? 'Enviando…' : 'Enviar confirmación'}
                   </button>
                 </form>
               )}

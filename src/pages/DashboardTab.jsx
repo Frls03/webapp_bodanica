@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { buildStats, formatDate, readGuests } from '../data/wedding'
+import { useEffect, useMemo, useState } from 'react'
+import { buildStats, fetchGuests, formatDate } from '../data/wedding'
 import './DashboardTab.css'
 
 const STATUS_FILTER = [
@@ -24,9 +24,13 @@ function StatCard({ label, value, accent, pct }) {
 }
 
 function DashboardTab() {
-  const [guests]   = useState(readGuests)
+  const [guests, setGuests] = useState([])
   const [filter, setFilter] = useState('all')
   const stats = useMemo(() => buildStats(guests), [guests])
+
+  useEffect(() => {
+    fetchGuests().then(setGuests)
+  }, [])
 
   const pctConfirmed = stats.total ? Math.round((stats.confirmed / stats.total) * 100) : 0
   const pctDeclined  = stats.total ? Math.round((stats.declined  / stats.total) * 100) : 0

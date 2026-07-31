@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -13,8 +13,9 @@ import {
   assignGuestToSeats,
   createTable,
   deleteTableFromList,
-  readGuests,
-  readTables,
+  deleteTableRemote,
+  fetchGuests,
+  fetchTables,
   saveGuests,
   saveTables,
   updateTableInList,
@@ -245,11 +246,16 @@ function DroppablePool({ children }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function TablesTab() {
-  const [guests, setGuests]       = useState(readGuests)
-  const [tables, setTables]       = useState(readTables)
+  const [guests, setGuests]       = useState([])
+  const [tables, setTables]       = useState([])
   const [active, setActive]       = useState(null)
   const [modal, setModal]         = useState(null)   // null | { mode, table }
   const [confirmDel, setConfirmDel] = useState(null) // table id | null
+
+  useEffect(() => {
+    fetchGuests().then(setGuests)
+    fetchTables().then(setTables)
+  }, [])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -284,7 +290,7 @@ export default function TablesTab() {
 
   // ── Table CRUD ───────────────────────────────────────────────────────────
   function handleSaveTable(formData) {
-    let nextTables, nextGuests = guests
+    let nextTables
 
     if (modal.mode === 'add') {
       nextTables = [...tables, createTable(formData)]
@@ -295,7 +301,7 @@ export default function TablesTab() {
 
       // Displace guests whose seats exceed new capacity
       let changed = false
-      nextGuests = guests.map(g => {
+      const nextGuests = guests.map(g => {
         if (g.tableId !== tableId) return g
         const valid = (g.seatNumbers ?? []).filter(sn => sn <= newCap)
         if (valid.length !== (g.seatNumbers ?? []).length) {
@@ -315,7 +321,7 @@ export default function TablesTab() {
     const nextGuests = guests.map(g =>
       g.tableId === tableId ? { ...g, tableId: '', seatNumbers: [], updatedAt: new Date().toISOString() } : g
     )
-    saveTables(nextTables); setTables(nextTables)
+    setTables(nextTables); deleteTableRemote(tableId)
     saveGuests(nextGuests); setGuests(nextGuests)
     setConfirmDel(null)
   }

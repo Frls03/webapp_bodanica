@@ -840,6 +840,19 @@
   transition: transform var(--t-fast), box-shadow var(--t-fast);
 }
 
+.inv-rsvp-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inv-rsvp-error {
+  margin: 0;
+  color: var(--decline);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .inv-rsvp-submit:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);

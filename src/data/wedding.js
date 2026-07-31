@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabaseClient'
+
 // ─── Wedding constants ────────────────────────────────────────────────────────
 export const coupleName = 'Fernando & Jesica'
 export const eventDateLabel = '14 de noviembre de 2026'
@@ -6,56 +8,10 @@ export const eventTimeLabel = '2:00 p.m.'
 export const eventLocation = 'Aldea el Conacaste, Casa de Playa Asunción'
 export const eventMapsLink = 'https://maps.app.goo.gl/hRLyHZ1qtPaQCys46'
 export const eventWazeLink = 'https://ul.waze.com/ul?place=ChIJEWHbhCb1iIURwoaDRfFWEwU&ll=13.93003500%2C-90.66018380&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location'
-export const adminUsername = 'admin'
-export const adminPassword = 'fj2026'
+export const hospedajeMessage = 'Para quienes quieran seguir disfrutando de la celebración, hemos preparado hospedaje cercano por Q160 por persona, ideal para reponer energías tras una noche especial.\nRecuerda que la confirmación del hospedaje es independiente al de la ceremonia, puedes realizarla directamente con nosotros.'
 
-// ─── Storage keys ─────────────────────────────────────────────────────────────
+// ─── Storage keys (client-side session convenience only — no credentials) ─────
 const GUEST_SESSION_KEY = 'bodanica.invite.session.v1'
-const ADMIN_SESSION_KEY = 'bodanica.admin.session.v1'
-const GUESTS_KEY = 'bodanica.guests.v1'
-const TABLES_KEY = 'bodanica.tables.v1'
-
-// ─── Table catalog (default seed) ─────────────────────────────────────────────
-export const tableCatalog = [
-  { id: 'mesa-1', name: 'Mesa 1', capacity: 8,  area: 'Familia cercana' },
-  { id: 'mesa-2', name: 'Mesa 2', capacity: 8,  area: 'Amistades' },
-  { id: 'mesa-3', name: 'Mesa 3', capacity: 10, area: 'Colegas' },
-  { id: 'mesa-4', name: 'Mesa 4', capacity: 6,  area: 'VIP' },
-  { id: 'mesa-5', name: 'Mesa 5', capacity: 10, area: 'Flexible' },
-]
-
-// ─── Table CRUD ───────────────────────────────────────────────────────────────
-export function readTables() {
-  try {
-    const raw = localStorage.getItem(TABLES_KEY)
-    if (!raw) return [...tableCatalog]
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : [...tableCatalog]
-  } catch {
-    return [...tableCatalog]
-  }
-}
-
-export function saveTables(tables) {
-  localStorage.setItem(TABLES_KEY, JSON.stringify(tables))
-}
-
-export function createTable(data) {
-  return {
-    id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`,
-    name: String(data.name ?? '').trim(),
-    area: String(data.area ?? '').trim(),
-    capacity: Math.max(2, Math.min(30, Number(data.capacity) || 8)),
-  }
-}
-
-export function updateTableInList(tables, id, changes) {
-  return tables.map(t => t.id === id ? { ...t, ...changes, capacity: Math.max(2, Math.min(30, Number(changes.capacity) || t.capacity)) } : t)
-}
-
-export function deleteTableFromList(tables, id) {
-  return tables.filter(t => t.id !== id)
-}
 
 // ─── Static invitation content ────────────────────────────────────────────────
 export const timeline = [
@@ -84,101 +40,63 @@ export const practicalAdvice = [
   'Contamos con espacio para parqueo.',
 ]
 
-// ─── Seed guests ──────────────────────────────────────────────────────────────
-const SEED_GUESTS = [
-  {
-    id: 'g-001',
-    password: 'jasmin-101',
-    fullName: 'Alicia Pérez',
-    names: ['Alicia Pérez'],
-    notes: 'Sin mariscos',
-    attendance: 'confirmed',
-    attendanceCount: 2,
-    maxAttendees: 2,
-    tableId: 'mesa-1',
-    seatNumbers: [1, 2],
-    createdAt: '2026-06-01T10:15:00.000Z',
-    updatedAt: '2026-06-01T10:15:00.000Z',
-  },
-  {
-    id: 'g-002',
-    password: 'jasmin-202',
-    fullName: 'Carlos Méndez',
-    names: ['Carlos Méndez'],
-    notes: 'Vegetariano para una persona',
-    attendance: 'pending',
-    attendanceCount: 0,
-    maxAttendees: 4,
-    tableId: '',
-    createdAt: '2026-06-03T19:45:00.000Z',
-    updatedAt: '2026-06-03T19:45:00.000Z',
-  },
-  {
-    id: 'g-003',
-    password: 'jasmin-303',
-    fullName: 'Sofía Ramírez',
-    names: ['Sofía Ramírez'],
-    notes: 'Alergia a nueces',
-    attendance: 'confirmed',
-    attendanceCount: 3,
-    maxAttendees: 3,
-    tableId: 'mesa-3',
-    seatNumbers: [1, 2, 3],
-    createdAt: '2026-06-06T13:30:00.000Z',
-    updatedAt: '2026-06-06T13:30:00.000Z',
-  },
-  {
-    id: 'g-004',
-    password: 'jasmin-404',
-    fullName: 'Javier Torres',
-    names: ['Javier Torres'],
-    notes: '',
-    attendance: 'declined',
-    attendanceCount: 0,
-    maxAttendees: 2,
-    tableId: '',
-    createdAt: '2026-06-07T08:00:00.000Z',
-    updatedAt: '2026-06-07T08:00:00.000Z',
-  },
-  {
-    id: 'g-005',
-    password: 'jasmin-505',
-    fullName: 'Valentina Cruz',
-    names: ['Valentina Cruz'],
-    notes: 'Celíaca',
-    attendance: 'confirmed',
-    attendanceCount: 2,
-    maxAttendees: 2,
-    tableId: '',
-    createdAt: '2026-06-08T09:00:00.000Z',
-    updatedAt: '2026-06-08T09:00:00.000Z',
-  },
-]
+// ─── DB row <-> app object mapping ─────────────────────────────────────────────
+function fromDbGuest(row) {
+  return {
+    id: row.id,
+    password: row.password,
+    fullName: row.full_name,
+    names: row.names?.length ? row.names : [row.full_name],
+    phone: row.phone ?? '',
+    notes: row.notes ?? '',
+    attendance: row.attendance,
+    attendanceCount: row.attendance_count,
+    maxAttendees: row.max_attendees,
+    tableId: row.table_id ?? '',
+    seatNumbers: row.seat_numbers ?? [],
+    hospedajeFee: row.hospedaje_fee ?? null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
 
-// ─── Guest CRUD ───────────────────────────────────────────────────────────────
+function toDbGuest(g) {
+  return {
+    id: g.id,
+    password: g.password,
+    full_name: g.fullName,
+    names: g.names?.length ? g.names : [g.fullName],
+    phone: g.phone ?? '',
+    notes: g.notes ?? '',
+    attendance: g.attendance,
+    attendance_count: g.attendanceCount,
+    max_attendees: g.maxAttendees,
+    table_id: g.tableId ?? '',
+    seat_numbers: g.seatNumbers ?? [],
+    hospedaje_fee: g.hospedajeFee ?? null,
+    updated_at: new Date().toISOString(),
+  }
+}
+
+// ─── Guest CRUD (admin — requires an authenticated Supabase session) ──────────
 export function generateId() {
   return `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
 }
 
-export function readGuests() {
-  try {
-    const raw = localStorage.getItem(GUESTS_KEY)
-    if (!raw) return [...SEED_GUESTS]
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : [...SEED_GUESTS]
-  } catch {
-    return [...SEED_GUESTS]
-  }
+export async function fetchGuests() {
+  const { data, error } = await supabase.from('guests').select('*').order('created_at', { ascending: false })
+  if (error) throw error
+  return data.map(fromDbGuest)
 }
 
-export function saveGuests(guests) {
-  localStorage.setItem(GUESTS_KEY, JSON.stringify(guests))
+export async function saveGuests(guests) {
+  const { error } = await supabase.from('guests').upsert(guests.map(toDbGuest))
+  if (error) throw error
 }
 
-// Searches ALL saved guests (including those added via admin)
-export function findGuestByPassword(password) {
-  const safePassword = password.trim().toLowerCase()
-  return readGuests().find(g => g.password.toLowerCase() === safePassword) ?? null
+export async function deleteGuestRemote(id) {
+  const { error } = await supabase.from('guests').delete().eq('id', id)
+  if (error) throw error
 }
 
 export function createGuest(data) {
@@ -189,12 +107,14 @@ export function createGuest(data) {
     password: String(data.password ?? '').trim(),
     fullName,
     names: [fullName],
+    phone: '',
     notes: String(data.notes ?? '').trim(),
     attendance: 'pending',
     attendanceCount: 0,
     maxAttendees: Math.max(1, Number(data.maxAttendees) || 1),
     tableId: '',
     seatNumbers: [],
+    hospedajeFee: null,
     createdAt: now,
     updatedAt: now,
   }
@@ -212,9 +132,7 @@ export function assignGuestToSeats(guests, guestId, tableId, startSeat, tables) 
     )
   }
 
-  // Use the live tables list (with user edits) falling back to the static catalog
-  const tableList = Array.isArray(tables) && tables.length ? tables : tableCatalog
-  const table = tableList.find(t => t.id === tableId)
+  const table = (tables ?? []).find(t => t.id === tableId)
   if (!table) return guests
 
   const cap   = table.capacity
@@ -249,20 +167,58 @@ export function deleteGuestFromList(guests, id) {
   return guests.filter(g => g.id !== id)
 }
 
-export function upsertGuest(guests, updatedGuest) {
-  const idx = guests.findIndex(g => g.id === updatedGuest.id)
-  if (idx === -1) return [updatedGuest, ...guests]
-  const next = [...guests]
-  next[idx] = { ...updatedGuest, updatedAt: new Date().toISOString() }
-  return next
+// ─── Table CRUD (admin) ─────────────────────────────────────────────────────
+export async function fetchTables() {
+  const { data, error } = await supabase.from('tables').select('*').order('name')
+  if (error) throw error
+  return data
 }
 
-export function assignGuestToTable(guests, guestId, tableId) {
-  return guests.map(g =>
-    g.id === guestId
-      ? { ...g, tableId: tableId ?? '', updatedAt: new Date().toISOString() }
-      : g
-  )
+export async function saveTables(tables) {
+  const { error } = await supabase.from('tables').upsert(tables)
+  if (error) throw error
+}
+
+export async function deleteTableRemote(id) {
+  const { error } = await supabase.from('tables').delete().eq('id', id)
+  if (error) throw error
+}
+
+export function createTable(data) {
+  return {
+    id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`,
+    name: String(data.name ?? '').trim(),
+    area: String(data.area ?? '').trim(),
+    capacity: Math.max(2, Math.min(30, Number(data.capacity) || 8)),
+  }
+}
+
+export function updateTableInList(tables, id, changes) {
+  return tables.map(t => t.id === id ? { ...t, ...changes, capacity: Math.max(2, Math.min(30, Number(changes.capacity) || t.capacity)) } : t)
+}
+
+export function deleteTableFromList(tables, id) {
+  return tables.filter(t => t.id !== id)
+}
+
+// ─── Guest-facing auth + RSVP (password-gated Postgres RPCs, no direct table access) ─
+export async function loginGuest(password) {
+  const { data, error } = await supabase.rpc('login_guest', { p_password: password })
+  if (error) throw error
+  return data?.[0] ? fromDbGuest(data[0]) : null
+}
+
+export async function submitRsvp(guest, { attendance, attendanceCount, notes }) {
+  const { data, error } = await supabase.rpc('submit_rsvp', {
+    p_guest_id: guest.id,
+    p_password: guest.password,
+    p_attendance: attendance,
+    p_attendance_count: attendanceCount,
+    p_notes: notes,
+  })
+  if (error) throw error
+  if (!data?.[0]) throw new Error('No se pudo actualizar la confirmación.')
+  return fromDbGuest(data[0])
 }
 
 // ─── Session management ────────────────────────────────────────────────────────
@@ -285,16 +241,20 @@ export function clearGuestSession() {
   sessionStorage.removeItem(GUEST_SESSION_KEY)
 }
 
-export function readAdminSession() {
-  return localStorage.getItem(ADMIN_SESSION_KEY) === 'true'
+// Admin session lives in Supabase Auth itself (no local credential storage).
+export async function readAdminSession() {
+  const { data } = await supabase.auth.getSession()
+  return data.session ?? null
 }
 
-export function saveAdminSession() {
-  localStorage.setItem(ADMIN_SESSION_KEY, 'true')
+export async function loginAdmin(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) throw error
+  return data.session
 }
 
-export function clearAdminSession() {
-  localStorage.removeItem(ADMIN_SESSION_KEY)
+export async function logoutAdmin() {
+  await supabase.auth.signOut()
 }
 
 // ─── Guest type ───────────────────────────────────────────────────────────────
@@ -336,6 +296,13 @@ export function formatDate(isoDate) {
 export function getInvitedName() {
   const params = new URLSearchParams(window.location.search)
   return params.get('invitado')?.trim() ?? 'Invitado especial'
+}
+
+// ─── Invitation message (for the admin "copy" button) ──────────────────────────
+export function buildInvitationMessage(guest) {
+  const firstName = (guest.names?.[0] ?? guest.fullName).split(' ')[0]
+  const link = `${window.location.origin}/invitacion`
+  return `Querido/a ${firstName}, es un honor invitarte a nuestra boda civil. Aquí tienes el link para tu invitación con su contraseña:\n${link}\nContraseña: ${guest.password}`
 }
 
 // ─── Excel import/export ──────────────────────────────────────────────────────

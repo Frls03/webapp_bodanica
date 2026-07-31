@@ -3,7 +3,7 @@ import PasswordGate from '../components/PasswordGate'
 import GuestsTab from './GuestsTab'
 import DashboardTab from './DashboardTab'
 import TablesTab from './TablesTab'
-import { clearAdminSession, coupleName, readAdminSession, saveAdminSession } from '../data/wedding'
+import { coupleName, logoutAdmin, readAdminSession } from '../data/wedding'
 import './Admin.css'
 
 const TABS = [
@@ -13,21 +13,21 @@ const TABS = [
 ]
 
 function AdminPanel() {
-  const [isAuth, setIsAuth]       = useState(() => readAdminSession())
+  const [isAuth, setIsAuth]       = useState(null) // null = checking session
   const [activeTab, setActiveTab] = useState('guests')
   const [menuOpen, setMenuOpen]   = useState(false)
 
   useEffect(() => {
     document.title = `${coupleName} | Admin`
+    readAdminSession().then(session => setIsAuth(!!session))
   }, [])
 
   function handleAuthenticated() {
-    saveAdminSession()
     setIsAuth(true)
   }
 
-  function handleLogout() {
-    clearAdminSession()
+  async function handleLogout() {
+    await logoutAdmin()
     setIsAuth(false)
   }
 
@@ -36,6 +36,7 @@ function AdminPanel() {
     setMenuOpen(false)
   }
 
+  if (isAuth === null) return null
   if (!isAuth) {
     return <PasswordGate mode="admin" onAuthenticated={handleAuthenticated} />
   }

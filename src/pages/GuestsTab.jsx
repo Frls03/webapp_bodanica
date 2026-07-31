@@ -1,12 +1,14 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
 import {
+  buildInvitationMessage,
   createGuest,
   deleteGuestFromList,
+  deleteGuestRemote,
   EXCEL_TEMPLATE_HEADERS,
+  fetchGuests,
   formatDate,
   parseExcelRows,
-  readGuests,
   saveGuests,
   updateGuestInList,
 } from '../data/wedding'
@@ -27,7 +29,8 @@ const ATTENDANCE_LABELS = {
 }
 
 function GuestsTab() {
-  const [guests, setGuests]         = useState(readGuests)
+  const [guests, setGuests]         = useState([])
+  const [loading, setLoading]       = useState(true)
   const [search, setSearch]         = useState('')
   const [filter, setFilter]         = useState('all')
   const [modal, setModal]           = useState(null) // null | { mode: 'add'|'edit', guest }
@@ -35,11 +38,26 @@ function GuestsTab() {
   const [formError, setFormError]   = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null) // guestId
   const [excelPreview, setExcelPreview]  = useState(null) // array of guests to import
+  const [copiedId, setCopiedId]     = useState(null)
   const fileRef = useRef(null)
 
-  function persist(next) {
+  useEffect(() => {
+    fetchGuests().then(setGuests).finally(() => setLoading(false))
+  }, [])
+
+  async function persist(next) {
     setGuests(next)
-    saveGuests(next)
+    try {
+      await saveGuests(next)
+    } catch (err) {
+      setFormError(`No se pudo guardar: ${err.message}`)
+    }
+  }
+
+  async function handleCopyMessage(guest) {
+    await navigator.clipboard.writeText(buildInvitationMessage(guest))
+    setCopiedId(guest.id)
+    setTimeout(() => setCopiedId(null), 1800)
   }
 
   // ── Filtering ────────────────────────────────────────────────────────────
@@ -108,9 +126,10 @@ function GuestsTab() {
   }
 
   // ── Delete ────────────────────────────────────────────────────────────────
-  function handleDelete(id) {
-    persist(deleteGuestFromList(guests, id))
+  async function handleDelete(id) {
+    setGuests(deleteGuestFromList(guests, id))
     setConfirmDelete(null)
+    await deleteGuestRemote(id)
   }
 
   // ── Excel download template ───────────────────────────────────────────────
@@ -150,6 +169,8 @@ function GuestsTab() {
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
+  if (loading) return <p className="gt-empty">Cargando invitados…</p>
+
   return (
     <div className="gt-root">
       <div className="gt-header">
@@ -257,6 +278,15 @@ function GuestsTab() {
                   <td className="gt-td-date">{formatDate(guest.createdAt)}</td>
                   <td>
                     <div className="gt-row-actions">
+                      <button
+                        type="button"
+                        className="gt-action-btn copy"
+                        onClick={() => handleCopyMessage(guest)}
+                        aria-label="Copiar mensaje de invitación"
+                        title="Copiar mensaje de invitación"
+                      >
+                        {copiedId === guest.id ? '✅' : '📋'}
+                      </button>
                       <button
                         type="button"
                         className="gt-action-btn edit"

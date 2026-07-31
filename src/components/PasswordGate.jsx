@@ -1,13 +1,5 @@
 import { useState } from 'react'
-import {
-  adminPassword,
-  adminUsername,
-  clearAdminSession,
-  clearGuestSession,
-  findGuestByPassword,
-  saveAdminSession,
-  saveGuestSession,
-} from '../data/wedding'
+import { clearGuestSession, loginAdmin, loginGuest, saveGuestSession } from '../data/wedding'
 import FloralCorner from './FloralCorner'
 import './PasswordGate.css'
 
@@ -29,7 +21,7 @@ function PasswordGate({ mode, onAuthenticated }) {
       const pwd = password.trim()
 
       if (isInvite) {
-        const guest = findGuestByPassword(pwd)
+        const guest = await loginGuest(pwd)
         if (!guest) {
           clearGuestSession()
           setError('La contraseña no coincide con ninguna invitación.')
@@ -41,16 +33,12 @@ function PasswordGate({ mode, onAuthenticated }) {
         return
       }
 
-      if (username.trim() === adminUsername && pwd === adminPassword) {
-        saveAdminSession()
-        onAuthenticated()
-        setUsername('')
-        setPassword('')
-        return
-      }
-
-      clearAdminSession()
-      setError('Usuario o contraseña incorrectos.')
+      await loginAdmin(username.trim(), pwd)
+      onAuthenticated()
+      setUsername('')
+      setPassword('')
+    } catch {
+      setError(isInvite ? 'No se pudo verificar la contraseña.' : 'Correo o contraseña incorrectos.')
       setPassword('')
     } finally {
       setLoading(false)
@@ -93,12 +81,12 @@ function PasswordGate({ mode, onAuthenticated }) {
         <form onSubmit={handleSubmit} className="gate-form">
           {!isInvite && (
             <div className="gate-field">
-              <label className="gate-label" htmlFor="gate-user">Usuario</label>
+              <label className="gate-label" htmlFor="gate-user">Correo</label>
               <input
                 id="gate-user"
-                type="text"
+                type="email"
                 className="gate-input"
-                placeholder="Usuario de administrador"
+                placeholder="Correo del administrador"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 autoComplete="username"
