@@ -59,11 +59,11 @@ export function deleteTableFromList(tables, id) {
 
 // ─── Static invitation content ────────────────────────────────────────────────
 export const timeline = [
-  { time: '14:00 p.m.', title: 'LLEGADA', detail: 'Recepción de invitados.' },
-  { time: '15:00 p.m.', title: 'CEREMONIA', detail: 'Unión en la Capilla.' },
-  { time: '16:00 p.m.', title: 'FOTOS CON LOS INVITADOS', detail: 'Sonrisas hoy, recuerdos para toda la vida.' },
-  { time: '17:00 p.m.', title: 'BANQUETE', detail: 'Buena comida, grandes amigos y una tarde inolvidable en la casa de playa.' },
-  { time: '18:00 p.m.', title: 'CELEBRACIÓN', detail: 'Baile y recuerdos hasta el amanecer.' },
+  { time: '14:00', title: 'LLEGADA', detail: 'Recepción de invitados.' },
+  { time: '15:00', title: 'CEREMONIA', detail: 'Unión en la Capilla.' },
+  { time: '16:00', title: 'FOTOS CON LOS INVITADOS', detail: 'Sonrisas hoy, recuerdos para toda la vida.' },
+  { time: '17:00', title: 'BANQUETE', detail: 'Buena comida, grandes amigos y una tarde inolvidable en la casa de playa.' },
+  { time: '18:00', title: 'CELEBRACIÓN', detail: 'Baile y recuerdos hasta el amanecer.' },
 ]
 
 export const dressCode = {
