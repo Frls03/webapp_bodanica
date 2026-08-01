@@ -271,7 +271,7 @@ export function getInvitedName() {
 // ─── Invitation message (for the admin "copy" button) ──────────────────────────
 export function buildInvitationMessage(guest) {
   const firstName = (guest.names?.[0] ?? guest.fullName).split(' ')[0]
-  const link = `${window.location.origin}/invitacion`
+  const link = 'https://bodafj.site/invitacion'
   return `Querido/a ${firstName}, es un honor invitarte a nuestra boda civil. Aquí tienes el link para tu invitación con su contraseña:\n${link}\nContraseña: ${guest.password}`
 }
 
