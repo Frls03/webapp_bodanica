@@ -160,6 +160,43 @@
   border-bottom: 1px solid var(--border-soft);
 }
 
+/* The nav/logo/logout styles above are tuned for the dark navy sidebar —
+   the mobile drawer has a light background, so they need dark-on-light
+   colors here instead or the text is just invisible. */
+.adm-mobile-drawer .adm-logo-eyebrow {
+  color: var(--text-muted);
+}
+
+.adm-mobile-drawer .adm-logo-title {
+  color: var(--navy);
+}
+
+.adm-mobile-drawer .adm-nav-item {
+  color: var(--text-strong);
+}
+
+.adm-mobile-drawer .adm-nav-item:hover {
+  background: rgba(27, 42, 74, 0.07);
+  color: var(--navy);
+}
+
+.adm-mobile-drawer .adm-nav-item.active {
+  background: rgba(27, 42, 74, 0.1);
+  border-color: rgba(27, 42, 74, 0.25);
+  color: var(--navy);
+}
+
+.adm-mobile-drawer .adm-logout-btn {
+  color: var(--text-muted);
+  border-color: var(--border-soft);
+}
+
+.adm-mobile-drawer .adm-logout-btn:hover {
+  background: rgba(27, 42, 74, 0.06);
+  border-color: var(--navy-light);
+  color: var(--navy);
+}
+
 /* ─── Main content ────────────────────────────────────────────────────────── */
 .adm-main {
   padding: clamp(1.25rem, 3vw, 2rem);
