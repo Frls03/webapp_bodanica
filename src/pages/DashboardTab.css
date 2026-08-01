@@ -10,6 +10,13 @@
   gap: 1.5rem;
 }
 
+/* Grid items default to min-width:auto — without this, wide content in any
+   row (e.g. an unbreakable badge/date string) forces the shared single
+   column, and every sibling row with it, wider than the viewport. */
+.dt-root > * {
+  min-width: 0;
+}
+
 /* ─── Stat cards ─────────────────────────────────────────────────────────── */
 .dt-stats-grid {
   display: grid;
@@ -296,6 +303,7 @@
     flex-wrap: nowrap;
     padding-bottom: 0.2rem;
     width: 100%;
+    min-width: 0;
   }
 
   .dt-guest-meta {

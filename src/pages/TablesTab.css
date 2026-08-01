@@ -4,6 +4,10 @@
   gap: 1.25rem;
 }
 
+.tt-root > * {
+  min-width: 0;
+}
+
 /* ─── Page header ─────────────────────────────────────────────────────────────── */
 .tt-page-header {
   display: flex;

@@ -4,6 +4,14 @@
   gap: 1.25rem;
 }
 
+/* Grid items default to min-width:auto, so a wide table's content can force
+   the whole single-column track wider than the viewport — and every other
+   row (header, filters…) gets stretched along with it, since they all share
+   that one column. */
+.gt-root > * {
+  min-width: 0;
+}
+
 /* Header */
 .gt-header {
   display: flex;
@@ -434,19 +442,33 @@
     align-items: stretch;
   }
 
+  /* Nowrap pill buttons can't shrink below their content, so on a narrow
+     screen a flex:1 row just blows the container wider than the viewport —
+     stack them instead of squeezing. */
   .gt-header-actions {
-    justify-content: stretch;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .gt-header-actions > * {
-    flex: 1;
     justify-content: center;
+  }
+
+  .gt-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gt-search {
+    min-width: 0;
   }
 
   .gt-filter-pills {
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 0.25rem;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .gt-field-row {
