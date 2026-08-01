@@ -53,7 +53,6 @@ function fromDbGuest(row) {
     attendanceCount: row.attendance_count,
     maxAttendees: row.max_attendees,
     tableId: row.table_id ?? '',
-    seatNumbers: row.seat_numbers ?? [],
     hospedajeFee: row.hospedaje_fee ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -72,7 +71,6 @@ function toDbGuest(g) {
     attendance_count: g.attendanceCount,
     max_attendees: g.maxAttendees,
     table_id: g.tableId ?? '',
-    seat_numbers: g.seatNumbers ?? [],
     hospedaje_fee: g.hospedajeFee ?? null,
     updated_at: new Date().toISOString(),
   }
@@ -113,46 +111,18 @@ export function createGuest(data) {
     attendanceCount: 0,
     maxAttendees: Math.max(1, Number(data.maxAttendees) || 1),
     tableId: '',
-    seatNumbers: [],
     hospedajeFee: null,
     createdAt: now,
     updatedAt: now,
   }
 }
 
-export function assignGuestToSeats(guests, guestId, tableId, startSeat, tables) {
-  const dragged = guests.find(g => g.id === guestId)
-  if (!dragged) return guests
-
-  const now = new Date().toISOString()
-
-  if (!tableId || startSeat == null) {
-    return guests.map(g =>
-      g.id === guestId ? { ...g, tableId: '', seatNumbers: [], updatedAt: now } : g
-    )
-  }
-
-  const table = (tables ?? []).find(t => t.id === tableId)
-  if (!table) return guests
-
-  const cap   = table.capacity
-  const count = Math.min(dragged.attendanceCount || 1, cap)
-  // Clamp start so the group never wraps past the last seat
-  const adjustedStart = Math.max(1, Math.min(startSeat, cap - count + 1))
-  const targetSeats = Array.from({ length: count }, (_, i) => adjustedStart + i)
-
-  // If any target seat is already taken by another guest → reject drop entirely
-  const hasConflict = guests.some(g =>
-    g.id !== guestId &&
-    g.tableId === tableId &&
-    (g.seatNumbers ?? []).some(sn => targetSeats.includes(sn))
+export function assignGuestToTable(guests, guestId, tableId) {
+  return guests.map(g =>
+    g.id === guestId
+      ? { ...g, tableId: tableId ?? '', updatedAt: new Date().toISOString() }
+      : g
   )
-  if (hasConflict) return guests
-
-  return guests.map(g => {
-    if (g.id === guestId) return { ...g, tableId, seatNumbers: targetSeats, updatedAt: now }
-    return g
-  })
 }
 
 export function updateGuestInList(guests, id, changes) {

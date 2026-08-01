@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  TouchSensor,
-  useDraggable,
-  useDroppable,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  assignGuestToSeats,
+  assignGuestToTable,
   createTable,
   deleteTableFromList,
   deleteTableRemote,
@@ -21,172 +11,6 @@ import {
   updateTableInList,
 } from '../data/wedding'
 import './TablesTab.css'
-
-const POOL_ID = '__pool__'
-const TABLE_SIZE = 260
-const SEAT_RADIUS = 97
-const SEAT_W = 52
-const SEAT_H = 26
-
-const PALETTE = [
-  { bg: '#fde8e0', border: '#e8a28c', text: '#7a2010' },
-  { bg: '#e8f0fe', border: '#93b4f5', text: '#1a3a7a' },
-  { bg: '#e8f5e9', border: '#7ec89e', text: '#1b5e20' },
-  { bg: '#fce4ec', border: '#f48fb1', text: '#7a1030' },
-  { bg: '#fff8e1', border: '#ffd54f', text: '#7a5000' },
-  { bg: '#f3e5f5', border: '#ce93d8', text: '#4a1060' },
-  { bg: '#e0f7fa', border: '#80deea', text: '#005060' },
-  { bg: '#fff3e0', border: '#ffb74d', text: '#7a3500' },
-]
-
-function guestColor(guestId) {
-  let h = 0
-  for (const c of guestId) h = (h * 31 + c.charCodeAt(0)) | 0
-  return PALETTE[Math.abs(h) % PALETTE.length]
-}
-
-function getSeatStyle(index, total) {
-  const angle = (index / total) * 2 * Math.PI - Math.PI / 2
-  const cx = TABLE_SIZE / 2, cy = TABLE_SIZE / 2
-  return {
-    position: 'absolute',
-    left: cx + SEAT_RADIUS * Math.cos(angle) - SEAT_W / 2,
-    top:  cy + SEAT_RADIUS * Math.sin(angle) - SEAT_H / 2,
-    width: SEAT_W, height: SEAT_H,
-  }
-}
-
-// ─── Draggable guest ──────────────────────────────────────────────────────────
-function DraggableGuest({ guest, variant = 'seat' }) {
-  const { attributes, listeners, setNodeRef, isDragging, transform } = useDraggable({ id: guest.id })
-  const moveStyle = transform ? { transform: `translate3d(${transform.x}px,${transform.y}px,0)` } : undefined
-  const col = guestColor(guest.id)
-
-  if (variant === 'pool') {
-    return (
-      <div
-        ref={setNodeRef}
-        style={{ ...moveStyle, background: col.bg, borderColor: col.border, color: col.text }}
-        className={`tt-pool-chip ${isDragging ? 'tt-dragging' : ''}`}
-        {...listeners} {...attributes}
-      >
-        <span className="tt-pool-name">{guest.fullName}</span>
-        {guest.attendanceCount > 1 && <span className="tt-pool-badge">{guest.attendanceCount}p</span>}
-      </div>
-    )
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={moveStyle}
-      className={`tt-seat-guest ${isDragging ? 'tt-dragging' : ''}`}
-      title={guest.fullName}
-      {...listeners} {...attributes}
-    >
-      {guest.fullName.split(' ')[0]}
-    </div>
-  )
-}
-
-// ─── Seat slot ────────────────────────────────────────────────────────────────
-function SeatSlot({ id, seatNum, guest, posStyle }) {
-  const { setNodeRef, isOver } = useDroppable({ id })
-  const col = guest ? guestColor(guest.id) : null
-  // Occupied seats block incoming drops — show different style
-  const isBlocked = isOver && !!guest
-  const isAccepting = isOver && !guest
-
-  return (
-    <div style={posStyle}>
-      <div
-        ref={setNodeRef}
-        className={`tt-seat ${guest ? 'occupied' : 'empty'} ${isBlocked ? 'seat-blocked' : isAccepting ? 'seat-over' : ''}`}
-        style={col ? { background: col.bg, borderColor: col.border, color: col.text } : undefined}
-      >
-        {guest
-          ? <DraggableGuest guest={guest} variant="seat" />
-          : <span className="tt-seat-num">{seatNum}</span>
-        }
-      </div>
-    </div>
-  )
-}
-
-// ─── Circular table ───────────────────────────────────────────────────────────
-function TableVisual({ table, guestList, onEdit, onDelete, confirmingDelete, onConfirmDelete, onCancelDelete }) {
-  const { capacity } = table
-  const guestBySeat = {}
-  guestList.forEach(g => { (g.seatNumbers ?? []).forEach(sn => { guestBySeat[sn] = g }) })
-  const seatsUsed = Object.keys(guestBySeat).length
-  const isFull = seatsUsed >= capacity
-
-  return (
-    <div className="tt-table-card">
-      <div className="tt-table-card-header">
-        <div className="tt-table-card-info">
-          <h3 className="tt-table-card-name">{table.name}</h3>
-          <p className="tt-table-card-area">{table.area}</p>
-        </div>
-        <div className="tt-table-card-actions">
-          <span className={`tt-seat-badge ${isFull ? 'full' : ''}`}>{seatsUsed}/{capacity}</span>
-          <button className="tt-icon-btn" title="Editar mesa" onClick={() => onEdit(table)}>✏</button>
-          <button className="tt-icon-btn danger" title="Eliminar mesa" onClick={() => onDelete(table.id)}>🗑</button>
-        </div>
-      </div>
-
-      {confirmingDelete && (
-        <div className="tt-confirm-del">
-          <p>¿Eliminar <strong>{table.name}</strong>? Los invitados asignados volverán al panel.</p>
-          <div className="tt-confirm-del-btns">
-            <button className="tt-btn-cancel" onClick={onCancelDelete}>Cancelar</button>
-            <button className="tt-btn-del-confirm" onClick={onConfirmDelete}>Eliminar</button>
-          </div>
-        </div>
-      )}
-
-      <div className="tt-circle-wrap" style={{ width: TABLE_SIZE, height: TABLE_SIZE }}>
-        <svg className="tt-lines" width={TABLE_SIZE} height={TABLE_SIZE}>
-          {Array.from({ length: capacity }, (_, i) => {
-            const angle = (i / capacity) * 2 * Math.PI - Math.PI / 2
-            const cx = TABLE_SIZE / 2, cy = TABLE_SIZE / 2
-            return (
-              <line key={i}
-                x1={cx + 44 * Math.cos(angle)} y1={cy + 44 * Math.sin(angle)}
-                x2={cx + SEAT_RADIUS * Math.cos(angle)} y2={cy + SEAT_RADIUS * Math.sin(angle)}
-                stroke="rgba(107,35,41,0.1)" strokeWidth="1"
-              />
-            )
-          })}
-        </svg>
-        <div className="tt-surface"><span>{table.name}</span></div>
-        {Array.from({ length: capacity }, (_, i) => {
-          const seatNum = i + 1
-          const slotId = `${table.id}:${seatNum}`
-          return (
-            <SeatSlot key={slotId} id={slotId} seatNum={seatNum}
-              guest={guestBySeat[seatNum] ?? null} posStyle={getSeatStyle(i, capacity)} />
-          )
-        })}
-      </div>
-
-      {guestList.length > 0 && (
-        <div className="tt-table-legend">
-          {guestList.map(g => {
-            const col = guestColor(g.id)
-            return (
-              <span key={g.id} className="tt-legend-chip"
-                style={{ background: col.bg, borderColor: col.border, color: col.text }}>
-                {g.fullName.split(' ')[0]}
-                {g.attendanceCount > 1 && <em>{g.attendanceCount}p</em>}
-              </span>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ─── Table modal ──────────────────────────────────────────────────────────────
 function TableModal({ mode, table, onSave, onClose }) {
@@ -234,62 +58,43 @@ function TableModal({ mode, table, onSave, onClose }) {
   )
 }
 
-// ─── Droppable pool ───────────────────────────────────────────────────────────
-function DroppablePool({ children }) {
-  const { setNodeRef, isOver } = useDroppable({ id: POOL_ID })
-  return (
-    <div ref={setNodeRef} className={`tt-pool ${isOver ? 'pool-over' : ''}`}>
-      {children}
-    </div>
-  )
-}
-
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function TablesTab() {
-  const [guests, setGuests]       = useState([])
-  const [tables, setTables]       = useState([])
-  const [active, setActive]       = useState(null)
-  const [modal, setModal]         = useState(null)   // null | { mode, table }
+  const [guests, setGuests] = useState([])
+  const [tables, setTables] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [modal, setModal]   = useState(null)   // null | { mode, table }
   const [confirmDel, setConfirmDel] = useState(null) // table id | null
 
   useEffect(() => {
-    fetchGuests().then(setGuests)
-    fetchTables().then(setTables)
+    Promise.all([fetchGuests(), fetchTables()])
+      .then(([g, t]) => { setGuests(g); setTables(t) })
+      .finally(() => setLoading(false))
   }, [])
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor,   { activationConstraint: { delay: 180, tolerance: 6 } })
-  )
-
-  const confirmed  = guests.filter(g => g.attendance === 'confirmed')
-  const unassigned = confirmed.filter(g => !g.tableId || !(g.seatNumbers ?? []).length)
-  const tableSummary = tables.map(t => ({
-    ...t,
-    guests: confirmed.filter(g => g.tableId === t.id && (g.seatNumbers ?? []).length),
-  }))
+  const confirmed = guests.filter(g => g.attendance === 'confirmed')
+  const unassignedCount = confirmed.filter(g => !g.tableId).length
   const totalPersons = confirmed.reduce((s, g) => s + g.attendanceCount, 0)
 
-  // ── Drag handlers ────────────────────────────────────────────────────────
-  function handleDragStart({ active: a }) {
-    setActive(guests.find(g => g.id === a.id) ?? null)
+  function occupancy(tableId) {
+    return confirmed
+      .filter(g => g.tableId === tableId)
+      .reduce((s, g) => s + g.attendanceCount, 0)
   }
 
-  function handleDragEnd({ active: a, over }) {
-    setActive(null)
-    if (!over) return
-    const guestId = String(a.id)
-    let tableId = '', startSeat = null
-    if (over.id !== POOL_ID) {
-      const [tId, sNum] = String(over.id).split(':')
-      tableId = tId; startSeat = Number(sNum)
+  // ── Assign guest to table (picker) ─────────────────────────────────────────
+  async function handleAssign(guest, tableId) {
+    const next = assignGuestToTable(guests, guest.id, tableId)
+    setGuests(next)
+    try {
+      await saveGuests(next)
+    } catch (err) {
+      alert(`No se pudo guardar: ${err.message}`)
     }
-    const updated = assignGuestToSeats(guests, guestId, tableId, startSeat, tables)
-    setGuests(updated); saveGuests(updated)
   }
 
   // ── Table CRUD ───────────────────────────────────────────────────────────
-  function handleSaveTable(formData) {
+  async function handleSaveTable(formData) {
     let nextTables
 
     if (modal.mode === 'add') {
@@ -299,124 +104,164 @@ export default function TablesTab() {
       const newCap  = Math.max(2, Math.min(30, Number(formData.capacity) || modal.table.capacity))
       nextTables = updateTableInList(tables, tableId, { ...formData, capacity: newCap })
 
-      // Displace guests whose seats exceed new capacity
-      let changed = false
-      const nextGuests = guests.map(g => {
-        if (g.tableId !== tableId) return g
-        const valid = (g.seatNumbers ?? []).filter(sn => sn <= newCap)
-        if (valid.length !== (g.seatNumbers ?? []).length) {
-          changed = true
-          return { ...g, tableId: '', seatNumbers: [], updatedAt: new Date().toISOString() }
-        }
-        return g
-      })
-      if (changed) { setGuests(nextGuests); saveGuests(nextGuests) }
+      // Unassign guests who no longer fit under the new (smaller) capacity
+      if (occupancy(tableId) > newCap) {
+        const nextGuests = guests.map(g =>
+          g.tableId === tableId ? { ...g, tableId: '', updatedAt: new Date().toISOString() } : g
+        )
+        setGuests(nextGuests)
+        saveGuests(nextGuests)
+      }
     }
 
-    saveTables(nextTables); setTables(nextTables); setModal(null)
+    setTables(nextTables); setModal(null)
+    try {
+      await saveTables(nextTables)
+    } catch (err) {
+      alert(`No se pudo guardar la mesa: ${err.message}`)
+    }
   }
 
-  function handleDeleteTable(tableId) {
+  async function handleDeleteTable(tableId) {
     const nextTables = deleteTableFromList(tables, tableId)
     const nextGuests = guests.map(g =>
-      g.tableId === tableId ? { ...g, tableId: '', seatNumbers: [], updatedAt: new Date().toISOString() } : g
+      g.tableId === tableId ? { ...g, tableId: '', updatedAt: new Date().toISOString() } : g
     )
-    setTables(nextTables); deleteTableRemote(tableId)
-    saveGuests(nextGuests); setGuests(nextGuests)
+    setTables(nextTables)
+    setGuests(nextGuests); saveGuests(nextGuests)
     setConfirmDel(null)
+    try {
+      await deleteTableRemote(tableId)
+    } catch (err) {
+      alert(`No se pudo eliminar la mesa: ${err.message}`)
+    }
   }
 
+  if (loading) return <p className="tt-empty">Cargando mesas…</p>
+
   return (
-    <DndContext sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragCancel={() => setActive(null)}
-    >
-      <div className="tt-root">
-        <div className="tt-page-header">
-          <div>
-            <h2 className="adm-section-title">Mesas</h2>
-            <p className="adm-section-subtitle">
-              Arrastra un invitado a la primera silla que ocupará — el sistema reserva tantas sillas como personas trae.
-            </p>
-          </div>
-          <button className="tt-btn-add-table" onClick={() => setModal({ mode: 'add', table: null })}>
-            + Nueva Mesa
-          </button>
+    <div className="tt-root">
+      <div className="tt-page-header">
+        <div>
+          <h2 className="adm-section-title">Mesas</h2>
+          <p className="adm-section-subtitle">
+            Elige la mesa de cada invitado confirmado desde la lista — el cupo se valida solo.
+          </p>
         </div>
+        <button className="tt-btn-add-table" onClick={() => setModal({ mode: 'add', table: null })}>
+          + Nueva Mesa
+        </button>
+      </div>
 
-        <div className="tt-summary adm-card">
-          <div className="tt-sum-item">
-            <span className="tt-sum-num">{confirmed.length}</span>
-            <span className="tt-sum-label">Invitaciones</span>
-          </div>
-          <div className="tt-sum-sep" />
-          <div className="tt-sum-item">
-            <span className="tt-sum-num">{totalPersons}</span>
-            <span className="tt-sum-label">Personas</span>
-          </div>
-          <div className="tt-sum-sep" />
-          <div className="tt-sum-item">
-            <span className={`tt-sum-num ${unassigned.length > 0 ? 'warn' : 'ok'}`}>
-              {unassigned.length}
-            </span>
-            <span className="tt-sum-label">Sin silla</span>
-          </div>
-          <div className="tt-sum-sep" />
-          <div className="tt-sum-item">
-            <span className="tt-sum-num">{tables.length}</span>
-            <span className="tt-sum-label">Mesas</span>
-          </div>
+      <div className="tt-summary adm-card">
+        <div className="tt-sum-item">
+          <span className="tt-sum-num">{confirmed.length}</span>
+          <span className="tt-sum-label">Invitaciones</span>
         </div>
-
-        <div className="tt-layout">
-          <aside className="tt-sidebar">
-            <div className="tt-sidebar-head">
-              <h3>Sin asignar</h3>
-              <span className="tt-badge-count">{unassigned.length}</span>
-            </div>
-            <DroppablePool>
-              {unassigned.length === 0
-                ? <p className="tt-pool-empty">✓ Todos tienen silla</p>
-                : unassigned.map(g => <DraggableGuest key={g.id} guest={g} variant="pool" />)
-              }
-            </DroppablePool>
-            <p className="tt-sidebar-hint">
-              Las sillas se reservan automáticamente según el número de personas de cada invitación.
-            </p>
-          </aside>
-
-          <div className="tt-tables-grid">
-            {tableSummary.map(t => (
-              <TableVisual
-                key={t.id}
-                table={t}
-                guestList={t.guests}
-                onEdit={t => setModal({ mode: 'edit', table: t })}
-                onDelete={id => setConfirmDel(id)}
-                confirmingDelete={confirmDel === t.id}
-                onConfirmDelete={() => handleDeleteTable(t.id)}
-                onCancelDelete={() => setConfirmDel(null)}
-              />
-            ))}
-
-            {/* Add table card */}
-            <button className="tt-add-card" onClick={() => setModal({ mode: 'add', table: null })}>
-              <span className="tt-add-icon">+</span>
-              <span>Nueva Mesa</span>
-            </button>
-          </div>
+        <div className="tt-sum-sep" />
+        <div className="tt-sum-item">
+          <span className="tt-sum-num">{totalPersons}</span>
+          <span className="tt-sum-label">Personas</span>
+        </div>
+        <div className="tt-sum-sep" />
+        <div className="tt-sum-item">
+          <span className={`tt-sum-num ${unassignedCount > 0 ? 'warn' : 'ok'}`}>
+            {unassignedCount}
+          </span>
+          <span className="tt-sum-label">Sin mesa</span>
+        </div>
+        <div className="tt-sum-sep" />
+        <div className="tt-sum-item">
+          <span className="tt-sum-num">{tables.length}</span>
+          <span className="tt-sum-label">Mesas</span>
         </div>
       </div>
 
-      <DragOverlay dropAnimation={null}>
-        {active ? (
-          <div className="tt-drag-ghost">
-            {active.fullName.split(' ')[0]}
-            {active.attendanceCount > 1 && <span> · {active.attendanceCount}p</span>}
+      {/* ── Table cards (read-only roster) ─────────────────────────────────── */}
+      <div className="tt-tables-grid">
+        {tables.map(t => {
+          const used = occupancy(t.id)
+          const isFull = used >= t.capacity
+          const tableGuests = confirmed.filter(g => g.tableId === t.id)
+          return (
+            <div className="tt-table-card" key={t.id}>
+              <div className="tt-table-card-header">
+                <div className="tt-table-card-info">
+                  <h3 className="tt-table-card-name">{t.name}</h3>
+                  <p className="tt-table-card-area">{t.area}</p>
+                </div>
+                <div className="tt-table-card-actions">
+                  <span className={`tt-seat-badge ${isFull ? 'full' : ''}`}>{used}/{t.capacity}</span>
+                  <button className="tt-icon-btn" title="Editar mesa" onClick={() => setModal({ mode: 'edit', table: t })}>✏</button>
+                  <button className="tt-icon-btn danger" title="Eliminar mesa" onClick={() => setConfirmDel(t.id)}>🗑</button>
+                </div>
+              </div>
+
+              {confirmDel === t.id && (
+                <div className="tt-confirm-del">
+                  <p>¿Eliminar <strong>{t.name}</strong>? Los invitados asignados quedarán sin mesa.</p>
+                  <div className="tt-confirm-del-btns">
+                    <button className="tt-btn-cancel" onClick={() => setConfirmDel(null)}>Cancelar</button>
+                    <button className="tt-btn-del-confirm" onClick={() => handleDeleteTable(t.id)}>Eliminar</button>
+                  </div>
+                </div>
+              )}
+
+              <ul className="tt-roster">
+                {tableGuests.length === 0
+                  ? <li className="tt-roster-empty">Sin invitados asignados</li>
+                  : tableGuests.map(g => (
+                      <li key={g.id}>
+                        {g.fullName}
+                        {g.attendanceCount > 1 && <em> · {g.attendanceCount}p</em>}
+                      </li>
+                    ))
+                }
+              </ul>
+            </div>
+          )
+        })}
+
+        <button className="tt-add-card" onClick={() => setModal({ mode: 'add', table: null })}>
+          <span className="tt-add-icon">+</span>
+          <span>Nueva Mesa</span>
+        </button>
+      </div>
+
+      {/* ── Assignment list — one picker per confirmed guest ─────────────────── */}
+      <div className="adm-card tt-assign-card">
+        <h3 className="tt-assign-title">Asignar invitados</h3>
+        {confirmed.length === 0 ? (
+          <p className="tt-empty">Todavía no hay invitados confirmados.</p>
+        ) : (
+          <div className="tt-assign-list">
+            {confirmed.map(g => (
+              <div className="tt-assign-row" key={g.id}>
+                <span className="tt-assign-name">
+                  {g.fullName}
+                  {g.attendanceCount > 1 && <em> · {g.attendanceCount}p</em>}
+                </span>
+                <select
+                  className="tt-assign-select"
+                  value={g.tableId || ''}
+                  onChange={e => handleAssign(g, e.target.value)}
+                >
+                  <option value="">Sin mesa</option>
+                  {tables.map(t => (
+                    <option
+                      key={t.id}
+                      value={t.id}
+                      disabled={t.id !== g.tableId && occupancy(t.id) + g.attendanceCount > t.capacity}
+                    >
+                      {t.name} ({occupancy(t.id)}/{t.capacity})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
           </div>
-        ) : null}
-      </DragOverlay>
+        )}
+      </div>
 
       {modal && (
         <TableModal
@@ -426,6 +271,6 @@ export default function TablesTab() {
           onClose={() => setModal(null)}
         />
       )}
-    </DndContext>
+    </div>
   )
 }

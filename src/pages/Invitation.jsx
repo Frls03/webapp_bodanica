@@ -428,15 +428,16 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
                       <label className="inv-rsvp-label" htmlFor="rsvp-count">
                         Número de personas (máx. {maxAttendees})
                       </label>
-                      <input
+                      <select
                         id="rsvp-count"
-                        type="number"
                         className="inv-rsvp-input"
-                        min={1}
-                        max={maxAttendees}
                         value={guestCount}
                         onChange={e => setGuestCount(e.target.value)}
-                      />
+                      >
+                        {Array.from({ length: maxAttendees }, (_, i) => i + 1).map(n => (
+                          <option key={n} value={n}>{n} {n === 1 ? 'persona' : 'personas'}</option>
+                        ))}
+                      </select>
                     </div>
                   )}
 

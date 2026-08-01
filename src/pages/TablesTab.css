@@ -1,4 +1,4 @@
-﻿/* TablesTab — visual seating chart ─────────────────────────────────────────── */
+/* TablesTab — table roster + picker-based assignment ───────────────────────── */
 .tt-root {
   display: grid;
   gap: 1.25rem;
@@ -43,6 +43,7 @@
   align-items: center;
   gap: 0.3rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .tt-icon-btn {
@@ -144,7 +145,8 @@
   box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 380px;
-  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .tt-modal-header {
@@ -267,127 +269,10 @@
   flex-shrink: 0;
 }
 
-/* ─── Page layout ─────────────────────────────────────────────────────────────── */
-.tt-layout {
-  display: grid;
-  grid-template-columns: 210px 1fr;
-  gap: 1.25rem;
-  align-items: start;
-}
-
-/* ─── Sidebar ─────────────────────────────────────────────────────────────────── */
-.tt-sidebar {
-  display: grid;
-  gap: 0.75rem;
-  position: sticky;
-  top: 80px;
-}
-
-.tt-sidebar-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tt-sidebar-head h3 {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  color: var(--wine);
-  margin: 0;
-}
-
-.tt-badge-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 5px;
-  border-radius: var(--r-full);
-  background: var(--navy);
-  color: var(--cream);
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-/* Pool droppable area */
-.tt-pool {
-  background: var(--surface);
-  border: 2px dashed rgba(107, 35, 41, 0.18);
-  border-radius: var(--r-lg);
-  padding: 0.65rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  min-height: 120px;
-  transition: border-color var(--t-fast), background var(--t-fast);
-}
-
-.tt-pool.pool-over {
-  border-color: var(--terracotta);
-  background: rgba(161, 60, 63, 0.04);
-}
-
-.tt-pool-empty {
-  margin: auto;
-  font-size: 0.8rem;
-  color: #2e7d52;
-  font-weight: 600;
-  text-align: center;
-  padding: 0.5rem;
-}
-
-/* Pool chip (unassigned guest) */
-.tt-pool-chip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.3rem;
-  padding: 0.4rem 0.7rem;
-  border-radius: var(--r-full);
-  border: 1.5px solid;
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
-  transition: transform var(--t-fast), box-shadow var(--t-fast), opacity var(--t-fast);
-}
-
-.tt-pool-chip:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-  filter: brightness(0.95);
-}
-
-.tt-pool-chip.tt-dragging { opacity: 0.3; cursor: grabbing; }
-
-.tt-pool-name {
-  font-size: 0.78rem;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
-}
-
-.tt-pool-badge {
-  font-size: 0.66rem;
-  font-weight: 800;
-  opacity: 0.75;
-  white-space: nowrap;
-}
-
-.tt-sidebar-hint {
-  margin: 0;
-  font-size: 0.73rem;
-  color: var(--text-muted);
-  line-height: 1.55;
-  text-align: center;
-}
-
 /* ─── Tables grid ─────────────────────────────────────────────────────────────── */
 .tt-tables-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1.25rem;
   align-items: start;
 }
@@ -401,14 +286,6 @@
   box-shadow: var(--shadow-sm);
   display: grid;
   gap: 0.75rem;
-  transition: box-shadow var(--t-med);
-}
-
-.tt-table-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
 }
 
 .tt-table-card-name {
@@ -442,183 +319,104 @@
   border-color: rgba(161, 60, 63, 0.25);
 }
 
-/* ─── Circular table visual ───────────────────────────────────────────────────── */
-.tt-circle-wrap {
-  position: relative;
-  margin: 0 auto;
-}
-
-/* SVG connector lines */
-.tt-lines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Center table circle */
-.tt-surface {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #922d34, var(--wine));
-  border: 3px solid rgba(216, 173, 88, 0.45);
+/* ─── Roster (read-only guest list on each table card) ───────────────────────── */
+.tt-roster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  place-items: center;
-  box-shadow:
-    0 4px 18px rgba(107, 35, 41, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  z-index: 2;
-}
-
-.tt-surface span {
-  font-family: var(--font-display);
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: rgba(255, 247, 235, 0.85);
-  letter-spacing: 0.06em;
-}
-
-/* ─── Seat slot ───────────────────────────────────────────────────────────────── */
-.tt-seat {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--r-full);
-  border: 1.5px solid rgba(107, 35, 41, 0.18);
-  background: var(--surface-solid);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  position: relative;
-  z-index: 3;
-  transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
-}
-
-.tt-seat.empty:hover {
-  border-color: rgba(107, 35, 41, 0.35);
-  background: rgba(107, 35, 41, 0.04);
-}
-
-.tt-seat.seat-over {
-  border-color: #2a7d52 !important;
-  background: rgba(42, 125, 82, 0.1) !important;
-  box-shadow: 0 0 0 3px rgba(42, 125, 82, 0.2);
-}
-
-.tt-seat.seat-blocked {
-  border-color: rgba(139, 48, 48, 0.7) !important;
-  background: rgba(139, 48, 48, 0.12) !important;
-  box-shadow: 0 0 0 3px rgba(139, 48, 48, 0.15);
-  cursor: not-allowed;
-}
-
-.tt-seat.occupied {
-  /* background and borderColor set via inline style (per-guest color) */
-}
-
-.tt-seat-num {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: rgba(107, 35, 41, 0.28);
-  pointer-events: none;
-}
-
-/* ─── Guest chip on seat ──────────────────────────────────────────────────────── */
-.tt-seat-guest {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  cursor: grab;
-  font-size: 0.59rem;
-  font-weight: 800;
-  text-align: center;
-  padding: 0 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-radius: var(--r-full);
-  touch-action: none;
-  transition: filter var(--t-fast), opacity var(--t-fast);
-  /* color is inherited from parent .tt-seat inline style */
-  color: inherit;
-}
-
-.tt-seat-guest:hover {
-  filter: brightness(0.9);
-}
-
-.tt-seat-guest.tt-dragging {
-  opacity: 0.2;
-  cursor: grabbing;
-}
-
-/* ─── Table legend ────────────────────────────────────────────────────────────── */
-.tt-table-legend {
-  display: flex;
-  flex-wrap: wrap;
   gap: 0.35rem;
-  padding-top: 0.25rem;
-  border-top: 1px solid var(--border-soft);
+  font-size: 0.85rem;
+  color: var(--text-strong);
 }
 
-.tt-legend-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--r-full);
-  border: 1px solid;
-  font-size: 0.72rem;
-  font-weight: 700;
+.tt-roster li {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-soft);
 }
 
-.tt-legend-chip em {
+.tt-roster li em {
   font-style: normal;
-  font-size: 0.65rem;
-  opacity: 0.7;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
-/* ─── Drag overlay ghost ──────────────────────────────────────────────────────── */
-.tt-drag-ghost {
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--r-full);
-  background: var(--navy);
-  color: var(--cream);
-  font-size: 0.78rem;
-  font-weight: 800;
-  box-shadow: var(--shadow-md);
-  transform: rotate(2deg) scale(1.06);
-  white-space: nowrap;
-  pointer-events: none;
+.tt-roster-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.2rem 0.1rem !important;
+}
+
+/* ─── Assignment list ─────────────────────────────────────────────────────────── */
+.tt-assign-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.tt-assign-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--navy);
+  margin: 0;
+}
+
+.tt-assign-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tt-assign-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--r-md);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-soft);
+}
+
+.tt-assign-name {
+  font-weight: 600;
+  color: var(--text-strong);
+  font-size: 0.9rem;
+  min-width: 0;
+}
+
+.tt-assign-name em {
+  font-style: normal;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tt-assign-select {
+  min-height: 2.5rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--border-soft);
+  background: var(--surface-solid);
+  color: var(--text-strong);
+  font-size: 0.85rem;
+  max-width: 100%;
+}
+
+.tt-assign-select:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+
+.tt-empty {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--text-muted);
 }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .tt-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .tt-sidebar {
-    position: static;
-  }
-
-  .tt-pool {
-    flex-direction: row;
-    flex-wrap: wrap;
-    min-height: auto;
-  }
-
-  .tt-tables-grid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  }
-}
-
 @media (max-width: 480px) {
   .tt-tables-grid {
     grid-template-columns: 1fr;
@@ -629,5 +427,13 @@
   }
 
   .tt-sum-sep { display: none; }
-}
 
+  .tt-assign-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tt-assign-select {
+    width: 100%;
+  }
+}
