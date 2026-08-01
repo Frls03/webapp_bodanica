@@ -452,5 +452,69 @@
   .gt-field-row {
     grid-template-columns: 1fr;
   }
+
+  /* Table → stacked cards, one per guest, instead of a sideways-scrolling grid */
+  .gt-table-wrap {
+    overflow-x: visible;
+  }
+
+  .gt-table thead {
+    display: none;
+  }
+
+  .gt-table, .gt-table tbody, .gt-table tr, .gt-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .gt-table tr {
+    margin-bottom: 0.85rem;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    padding: 0.85rem 1rem;
+    background: var(--surface-solid);
+  }
+
+  .gt-table tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .gt-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed var(--border-soft);
+    text-align: right;
+  }
+
+  .gt-table td:last-child {
+    border-bottom: none;
+    padding-top: 0.6rem;
+  }
+
+  .gt-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+  }
+
+  .gt-table td[data-label="Acciones"] {
+    justify-content: flex-end;
+  }
+
+  .gt-table td[data-label="Acciones"]::before {
+    display: none;
+  }
+
+  .gt-row-actions {
+    justify-content: flex-end;
+  }
 }
 

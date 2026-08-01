@@ -264,19 +264,19 @@ function GuestsTab() {
             <tbody>
               {visible.map(guest => (
                 <tr key={guest.id}>
-                  <td className="gt-td-name">{guest.fullName}</td>
-                  <td>
+                  <td className="gt-td-name" data-label="Nombre">{guest.fullName}</td>
+                  <td data-label="Contraseña">
                     <code className="gt-password-chip">{guest.password}</code>
                   </td>
-                  <td className="gt-td-center">{guest.maxAttendees}</td>
-                  <td>
+                  <td className="gt-td-center" data-label="Máx.">{guest.maxAttendees}</td>
+                  <td data-label="Estado">
                     <span className={`gt-status-badge gt-status-${guest.attendance}`}>
                       {ATTENDANCE_LABELS[guest.attendance] ?? guest.attendance}
                     </span>
                   </td>
-                  <td className="gt-td-center">{guest.tableId || '—'}</td>
-                  <td className="gt-td-date">{formatDate(guest.createdAt)}</td>
-                  <td>
+                  <td className="gt-td-center" data-label="Mesa">{guest.tableId || '—'}</td>
+                  <td className="gt-td-date" data-label="Fecha creación">{formatDate(guest.createdAt)}</td>
+                  <td data-label="Acciones">
                     <div className="gt-row-actions">
                       <button
                         type="button"
