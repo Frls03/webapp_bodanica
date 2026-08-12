@@ -290,3 +290,31 @@ export function parseExcelRows(rows) {
       })
     )
 }
+
+// ─── Guest media (photos/videos) — public bucket, no auth ─────────────────────
+const MEDIA_BUCKET = 'wedding-media'
+
+export async function listMedia() {
+  const { data, error } = await supabase.storage.from(MEDIA_BUCKET).list('', {
+    sortBy: { column: 'created_at', order: 'desc' },
+  })
+  if (error) throw error
+  return (data ?? [])
+    .filter(f => f.name !== '.emptyFolderPlaceholder')
+    .map(f => ({
+      name: f.name,
+      isVideo: /\.(mp4|mov|webm|m4v)$/i.test(f.name),
+      url: supabase.storage.from(MEDIA_BUCKET).getPublicUrl(f.name).data.publicUrl,
+    }))
+}
+
+export async function uploadMedia(file, uploaderName) {
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${safeName}`
+  const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+    metadata: uploaderName ? { uploader: uploaderName } : undefined,
+  })
+  if (error) throw error
+}

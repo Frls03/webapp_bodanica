@@ -135,6 +135,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
           <a href="#detalles">Detalles</a>
           <a href="#cronograma">Cronograma</a>
           <a href="#rsvp">RSVP</a>
+          <a href="/galeria">📷 Fotos y Videos</a>
         </div>
         <a href="#rsvp" className="inv-nav-cta">Confirmar</a>
       </nav>
@@ -484,6 +485,7 @@ function Invitation({ guest, onChangeGuest, onGuestUpdate }) {
           <a href="#inicio">Inicio</a>
           <a href="#detalles">Detalles</a>
           <a href="#rsvp">RSVP</a>
+          <a href="/galeria">Fotos y Videos</a>
         </nav>
       </footer>
     </div>
